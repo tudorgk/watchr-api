@@ -74,7 +74,7 @@ class EventManagerController extends \BaseController {
         $_event_category_array[] = 1;
 
         if (Input::get("categories")){
-            $_event_category_array = json_decode(Input::get("categories"));
+            $_event_category_array = Input::get("categories");
         }
 
         //getting creator ID using OAuth

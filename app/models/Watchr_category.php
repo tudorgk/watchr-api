@@ -21,5 +21,7 @@ class Watchr_category extends \Eloquent {
 
     public $timestamps = false;
 
-
+    public function subcategories(){
+        return $this->hasMany('Watchr_category','fk_subcategory');
+    }
 }

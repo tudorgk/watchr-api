@@ -337,6 +337,11 @@ Route::group(array('before' => 'oauth'), function()
                 "uses" => "CategoryController@get_all_categories"
             ]);
 
+        Route::get("category/structured", [
+                "as"   => "category/structured",
+                "uses" => "CategoryController@get_all_categories_structured"
+            ]);
+
         Route::get("category/{category_id}", [
                 "as"   => "category/{category_id}",
                 "uses" => "CategoryController@get_category_info"
