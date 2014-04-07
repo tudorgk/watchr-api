@@ -42,7 +42,7 @@ class User_profile extends \Eloquent {
 
     protected $primaryKey = "user_id";
 
-    protected $hidden = ["password"];
+    protected $hidden = ["password", "salt"];
 
     protected $guarded = [
         "user_id",

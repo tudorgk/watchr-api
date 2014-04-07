@@ -19,23 +19,36 @@ Route::get('/', function()
 //User Profile routes
 Route::model("user", "User_profile");
 
-Route::get("users", [
+Route::get("user/all", [
         "as"   => "user/index",
         "uses" => "UserProfileController@index"
     ]);
-Route::post("users", [
-        "as"   => "user/store",
-        "uses" => "UserProfileController@store"
-    ]);
-Route::get("users/{user_id}", [
+Route::get("user/{user_id}", [
         "as"   => "user/show",
         "uses" => "UserProfileController@show"
     ]);
-Route::put("users/{user_id}", [
+Route::post("user", [
+        "as"   => "user/store",
+        "uses" => "UserProfileController@store"
+    ]);
+Route::put("user/{user_id}", [
         "as"   => "user/update",
         "uses" => "UserProfileController@update"
     ]);
 Route::delete("users/{user_id}", [
         "as"   => "user/destroy",
         "uses" => "UserProfileController@destroy"
+    ]);
+
+//Country routes
+//User Profile routes
+Route::model("country", "Country");
+
+Route::get("countries", [
+        "as"   => "countries/index",
+        "uses" => "CountryController@index"
+    ]);
+Route::get("country/{country_id}", [
+        "as"   => "country/show",
+        "uses" => "CountryController@show"
     ]);
