@@ -41,7 +41,6 @@ Route::delete("users/{user_id}", [
     ]);
 
 //Country routes
-//User Profile routes
 Route::model("country", "Country");
 
 Route::get("countries", [
@@ -52,3 +51,42 @@ Route::get("country/{country_id}", [
         "as"   => "country/show",
         "uses" => "CountryController@show"
     ]);
+
+
+//profile_statuses routes
+Route::model("profile_status", "Profile_status");
+
+Route::get("profileStatuses", [
+        "as"   => "profileStatuses/index",
+        "uses" => "ProfileStatusController@index"
+    ]);
+
+//User Profile routes
+Route::model("device", "Device");
+Route::model("profile_device", "Profile_device");
+
+Route::get("devicesForUser/{user_id}", [
+        "as"   => "devicesForUser/show",
+        "uses" => "ProfileDeviceManagerController@show_users_devices"
+    ]);
+
+Route::get("device/{device_id}", [
+        "as"   => "device/show",
+        "uses" => "ProfileDeviceManagerController@show"
+    ]);
+
+Route::post("device", [
+        "as"   => "device/store",
+        "uses" => "ProfileDeviceManagerController@store"
+    ]);
+Route::put("device/{device_id}", [
+        "as"   => "device/update",
+        "uses" => "ProfileDeviceManagerController@update"
+    ]);
+Route::delete("device/{device_id}", [
+        "as"   => "device/destroy",
+        "uses" => "ProfileDeviceManagerController@destroy"
+    ]);
+
+
+
