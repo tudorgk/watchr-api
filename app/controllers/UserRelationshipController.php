@@ -74,11 +74,10 @@ class UserRelationshipController extends \BaseController {
 
         if($result){
             return Response::json(array(
-                    "response_msg"=>"Friend relationship already exists",
+                    "response_msg"=>"Relationship already exists",
                 )
                 ,400);
         }
-
 
         $relationship = new Relationship();
         $relationship->fk_user_1 = $user_id;
@@ -118,13 +117,85 @@ class UserRelationshipController extends \BaseController {
 	public function modify_relationship()
 	{
 		$validator = CustomValidator::Instance();
+        //TODO: Need to dynamically get the relationship type id. this will do for now
 
-        //get  relationship type ids
-        $request_types_array= Relationship_type::all();
+        //extracting variables
+        $user_id = Input::get("user_id");
+        $relationship_id = Input::get("relationship_id");
+        $relationship_type = Input::get("relationship_type");
 
-        var_dump($request_types_array);
+        if(is_null($user_id) || strcmp($user_id,"") == 0 ||
+            !is_numeric($user_id) || !$validator->exists_in_db('user_profile', 'user_id',$user_id )){
+            return Response::json(array(
+                    "response_msg"=>"Invalid User ID",
+                )
+                ,400);
+        }
 
-        $validator = CustomValidator::Instance();
+        if(is_null($relationship_id) || strcmp($relationship_id,"") == 0 ||
+            !is_numeric($relationship_id) || !$validator->exists_in_db('relationship', 'relationship_id',$relationship_id )){
+            return Response::json(array(
+                    "response_msg"=>"Invalid Relationship ID",
+                )
+                ,400);
+        }
+
+        switch ($relationship_type) {
+            case 1:
+                //pending
+                return Response::json(array(
+                        "response_msg"=>"Invalid relationship type",
+                    )
+                    ,400);
+                break;
+            case 2:
+                //friend
+                //set the relationship_type value to 2 (accept friend request)
+                $relationship_entry = Relationship::find($relationship_id);
+                if($relationship_entry->fk_relationship_type == 1 &&
+                    $relationship_entry->fk_user_2 == $user_id){
+                    $relationship_entry->fk_relationship_type = 2;
+                    $relationship_entry->save();
+                    return Response::json(
+                        array(
+                            "response_msg"=>"Request Ok",
+                            "data" => $relationship_entry->toArray())
+                        ,200);
+
+                    //TODO: Notify user accepted friend request
+                }else{
+                    return Response::json(array(
+                            "response_msg"=>"User cannot accept his own friend request. Or trying to modify a !pending friend request",
+                        )
+                        ,400);
+                }
+                break;
+            case 3:
+                //blocked
+                //don't know yet
+                break;
+            case 4:
+                //rejected
+                //delete the request from relationship table
+                $relationship_entry = Relationship::find($relationship_id);
+                $relationship_entry->delete();
+                return Response::json(
+                    array(
+                        "response_msg"=>"User rejected the friend request")
+                    ,200);
+                break;
+            case 5:
+                //deleted
+                //delete friendship from relationship table
+                $relationship_entry = Relationship::find($relationship_id);
+                $relationship_entry->delete();
+                return Response::json(
+                    array(
+                        "response_msg"=>"User unfriended")
+                    ,200);
+                break;
+
+        }
 
 	}
 
