@@ -61,28 +61,38 @@ Route::get("profileStatuses", [
         "uses" => "ProfileStatusController@index"
     ]);
 
-//User Profile routes
+/*
+ * device Profile routes
+ */
 Route::model("device", "Device");
 Route::model("profile_device", "Profile_device");
 
+//get all the devices for the user
 Route::get("devicesForUser/{user_id}", [
         "as"   => "devicesForUser/show",
         "uses" => "ProfileDeviceManagerController@show_users_devices"
     ]);
 
+//show a device for a particular user
 Route::get("device/{device_id}", [
         "as"   => "device/show",
         "uses" => "ProfileDeviceManagerController@show"
     ]);
 
+//add another device and bind it with the user
 Route::post("device", [
         "as"   => "device/store",
         "uses" => "ProfileDeviceManagerController@store"
     ]);
+
+
+//update device credentials
 Route::put("device/{device_id}", [
         "as"   => "device/update",
         "uses" => "ProfileDeviceManagerController@update"
     ]);
+
+//remove a device
 Route::delete("device/{device_id}", [
         "as"   => "device/destroy",
         "uses" => "ProfileDeviceManagerController@destroy"
