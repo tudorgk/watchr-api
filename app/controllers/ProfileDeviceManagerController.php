@@ -222,10 +222,9 @@ class ProfileDeviceManagerController extends \BaseController {
 
         $device = Device::find($device_id);
 
-
         $device->brand = $brand;
         $device->model = $model;
-        $device->device_uid= $device_id;
+        $device->device_uid= $device_uid;
         $device->device_token = $device_token;
         $device->save();
 
@@ -239,12 +238,31 @@ class ProfileDeviceManagerController extends \BaseController {
 	/**
 	 * Remove the specified resource from storage.
 	 *
-	 * @param  int  $device_id
 	 * @return Response
 	 */
-	public function destroy($device_id)
+	public function destroy()
 	{
-		//
-	}
+		$validator = CustomValidator::Instance();
+        $device_id = Input::get('device_id');
+
+        if(is_null($device_id) || strcmp($device_id,"") == 0 ||
+            !is_numeric($device_id) || !$validator->exists_in_db('device', 'device_id',$device_id )){
+            return Response::json(array(
+                    "response_msg"=>"Invalid Device ID",
+                )
+                ,400);
+        }
+
+        //TODO: Check database implementation for deletion constraint
+        $device_record = Device::find($device_id);
+        if($device_record)
+            $device_record->delete();
+
+        return Response::json(array(
+                "response_msg"=>"Request Ok",
+            )
+            ,200);
+
+    }
 
 }

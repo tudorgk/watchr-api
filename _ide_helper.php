@@ -12634,5 +12634,244 @@ namespace {
 		 }
 
 	}
+	class AuthorizationServer extends \LucaDegasperi\OAuth2Server\Facades\AuthorizationServerFacade{
+		/**
+		 * Create a new AuthorizationServerProxy
+		 *
+		 * @param Authorization $authServer the OAuth Authorization Server to use
+		 * @static 
+		 */
+		 public static function __construct($authServer){
+			//Method inherited from \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy
+			 \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy::__construct($authServer);
+		 }
+
+		/**
+		 * Pass the method call to the underlying Authorization Server
+		 *
+		 * @param string $method the method being called
+		 * @param array|null $args the arguments of the method being called
+		 * @return mixed the underlying method retuned value
+		 * @static 
+		 */
+		 public static function __call($method, $args){
+			//Method inherited from \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy
+			return \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy::__call($method, $args);
+		 }
+
+		/**
+		 * Make a redirect to a client redirect URI
+		 *
+		 * @param string $uri            the uri to redirect to
+		 * @param array  $params         the query string parameters
+		 * @param string $queryDelimeter the query string delimiter
+		 * @return Redirect               a Redirect object
+		 * @static 
+		 */
+		 public static function makeRedirect($uri, $params = array(), $queryDelimeter = '?'){
+			//Method inherited from \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy
+			return \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy::makeRedirect($uri, $params, $queryDelimeter);
+		 }
+
+		/**
+		 * Make a redirect with an authorization code
+		 *
+		 * @param string $code   the authorization code of the redirection
+		 * @param array  $params the redirection parameters
+		 * @return Redirect       a Redirect object
+		 * @static 
+		 */
+		 public static function makeRedirectWithCode($code, $params = array()){
+			//Method inherited from \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy
+			return \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy::makeRedirectWithCode($code, $params);
+		 }
+
+		/**
+		 * Make a redirect with an error
+		 *
+		 * @param array  $params the redirection parameters
+		 * @return Redirect       a Redirect object
+		 * @static 
+		 */
+		 public static function makeRedirectWithError($params = array()){
+			//Method inherited from \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy
+			return \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy::makeRedirectWithError($params);
+		 }
+
+		/**
+		 * Check the authorization code request parameters
+		 *
+		 * @throws \OAuth2\Exception\ClientException
+		 * @return array Authorize request parameters
+		 * @static 
+		 */
+		 public static function checkAuthorizeParams(){
+			//Method inherited from \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy
+			return \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy::checkAuthorizeParams();
+		 }
+
+		/**
+		 * Authorize a new client
+		 *
+		 * @param string $owner    The owner type
+		 * @param string $owner_id The owner id
+		 * @param array  $options  Additional options to issue an authorization code
+		 * @return string           An authorization code
+		 * @static 
+		 */
+		 public static function newAuthorizeRequest($owner, $owner_id, $options){
+			//Method inherited from \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy
+			return \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy::newAuthorizeRequest($owner, $owner_id, $options);
+		 }
+
+		/**
+		 * Perform the access token flow
+		 *
+		 * @return Response the appropriate response object
+		 * @static 
+		 */
+		 public static function performAccessTokenFlow(){
+			//Method inherited from \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy
+			return \LucaDegasperi\OAuth2Server\Proxies\AuthorizationServerProxy::performAccessTokenFlow();
+		 }
+
+	}
+	class ResourceServer extends \LucaDegasperi\OAuth2Server\Facades\ResourceServerFacade{
+		/**
+		 * Sets up the Resource
+		 *
+		 * @param SessionInterface  The Session Storage Object
+		 * @static 
+		 */
+		 public static function __construct($session){
+			//Method inherited from \League\OAuth2\Server\Resource
+			 \League\OAuth2\Server\Resource::__construct($session);
+		 }
+
+		/**
+		 * Sets the Request Object
+		 *
+		 * @param RequestInterface The Request Object
+		 * @static 
+		 */
+		 public static function setRequest($request){
+			//Method inherited from \League\OAuth2\Server\Resource
+			 \League\OAuth2\Server\Resource::setRequest($request);
+		 }
+
+		/**
+		 * Gets the Request object.  It will create one from the globals if one is not set.
+		 *
+		 * @return Util\RequestInterface
+		 * @static 
+		 */
+		 public static function getRequest(){
+			//Method inherited from \League\OAuth2\Server\Resource
+			return \League\OAuth2\Server\Resource::getRequest();
+		 }
+
+		/**
+		 * Returns the query string key for the access token.
+		 *
+		 * @return string
+		 * @static 
+		 */
+		 public static function getTokenKey(){
+			//Method inherited from \League\OAuth2\Server\Resource
+			return \League\OAuth2\Server\Resource::getTokenKey();
+		 }
+
+		/**
+		 * Sets the query string key for the access token.
+		 *
+		 * @param $key The new query string key
+		 * @static 
+		 */
+		 public static function setTokenKey($key){
+			//Method inherited from \League\OAuth2\Server\Resource
+			 \League\OAuth2\Server\Resource::setTokenKey($key);
+		 }
+
+		/**
+		 * Gets the access token owner ID.
+		 *
+		 * @return string
+		 * @static 
+		 */
+		 public static function getOwnerId(){
+			//Method inherited from \League\OAuth2\Server\Resource
+			return \League\OAuth2\Server\Resource::getOwnerId();
+		 }
+
+		/**
+		 * Gets the owner type.
+		 *
+		 * @return string
+		 * @static 
+		 */
+		 public static function getOwnerType(){
+			//Method inherited from \League\OAuth2\Server\Resource
+			return \League\OAuth2\Server\Resource::getOwnerType();
+		 }
+
+		/**
+		 * Gets the access token.
+		 *
+		 * @return string
+		 * @static 
+		 */
+		 public static function getAccessToken(){
+			//Method inherited from \League\OAuth2\Server\Resource
+			return \League\OAuth2\Server\Resource::getAccessToken();
+		 }
+
+		/**
+		 * Gets the client ID that created the session
+		 *
+		 * @return string
+		 * @static 
+		 */
+		 public static function getClientId(){
+			//Method inherited from \League\OAuth2\Server\Resource
+			return \League\OAuth2\Server\Resource::getClientId();
+		 }
+
+		/**
+		 * Checks if the access token is valid or not.
+		 *
+		 * @param $headersOnly Limit Access Token to Authorization header only
+		 * @throws Exception\InvalidAccessTokenException Thrown if the presented access token is not valid
+		 * @return bool
+		 * @static 
+		 */
+		 public static function isValid($headersOnly = false){
+			//Method inherited from \League\OAuth2\Server\Resource
+			return \League\OAuth2\Server\Resource::isValid($headersOnly);
+		 }
+
+		/**
+		 * Get the session scopes
+		 *
+		 * @return array
+		 * @static 
+		 */
+		 public static function getScopes(){
+			//Method inherited from \League\OAuth2\Server\Resource
+			return \League\OAuth2\Server\Resource::getScopes();
+		 }
+
+		/**
+		 * Checks if the presented access token has the given scope(s).
+		 *
+		 * @param array|string  An array of scopes or a single scope as a string
+		 * @return bool         Returns bool if all scopes are found, false if any fail
+		 * @static 
+		 */
+		 public static function hasScope($scopes){
+			//Method inherited from \League\OAuth2\Server\Resource
+			return \League\OAuth2\Server\Resource::hasScope($scopes);
+		 }
+
+	}
 }
 

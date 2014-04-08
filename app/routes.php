@@ -93,10 +93,53 @@ Route::put("device/{device_id}", [
     ]);
 
 //remove a device
-Route::delete("device/{device_id}", [
+Route::delete("device", [
         "as"   => "device/destroy",
         "uses" => "ProfileDeviceManagerController@destroy"
     ]);
 
 
+
+/*
+ * User Relationships routes
+ */
+Route::model("relationship", "Relationship");
+Route::model("relationship_type", "Relationship_type");
+
+//get Relationship Types
+Route::get("relationshipTypes", [
+        "as"   => "relationshipTypes/show",
+        "uses" => "UserRelationshipController@show_all_relationship_types"
+    ]);
+
+
+//get pending Friend Requests List
+Route::get("relationshipFriendRequests/{user_id}", [
+        "as"   => "relationshipFriendRequests/show",
+        "uses" => "UserRelationshipController@show_friend_requests"
+    ]);
+
+//get Friend List
+Route::get("relationshipFriends/{user_id}", [
+        "as"   => "relationshipFriends/show",
+        "uses" => "UserRelationshipController@show_friends"
+    ]);
+
+//get Blocked List
+Route::get("relationshipBlockedUsers/{user_id}", [
+        "as"   => "relationshipBlockedUsers/show",
+        "uses" => "UserRelationshipController@show_blocked_users"
+    ]);
+
+//send Friend Request to user
+Route::post("friendRequest", [
+        "as"   => "friendRequest/store",
+        "uses" => "UserRelationshipController@send_friend_request"
+    ]);
+
+//modify Relationship Type (accept/block/ignore Request)
+Route::put("modifyRelationship", [
+        "as"   => "modifyRelationship/modify",
+        "uses" => "UserRelationshipController@modify_relationship"
+    ]);
 
