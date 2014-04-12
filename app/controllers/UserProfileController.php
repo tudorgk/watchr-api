@@ -104,7 +104,7 @@ class UserProfileController extends \BaseController {
                     'email',
                     'first_name',
                     'last_name',
-                    'created_date'
+                    'created_at'
                 ));
         }else{
             return Response::json(array("message"=>"ID is not a numeric value"),400);

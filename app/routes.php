@@ -31,11 +31,11 @@ Route::post("user", [
         "as"   => "user/store",
         "uses" => "UserProfileController@store"
     ]);
-Route::put("user/{user_id}", [
+Route::post("user/update/{user_id}", [
         "as"   => "user/update",
         "uses" => "UserProfileController@update"
     ]);
-Route::delete("users/{user_id}", [
+Route::post("user/delete/{user_id}", [
         "as"   => "user/destroy",
         "uses" => "UserProfileController@destroy"
     ]);
@@ -43,7 +43,7 @@ Route::delete("users/{user_id}", [
 //Country routes
 Route::model("country", "Country");
 
-Route::get("countries", [
+Route::get("country/all", [
         "as"   => "countries/index",
         "uses" => "CountryController@index"
     ]);
@@ -56,7 +56,7 @@ Route::get("country/{country_id}", [
 //profile_statuses routes
 Route::model("profile_status", "Profile_status");
 
-Route::get("profileStatuses", [
+Route::get("profile_status/all", [
         "as"   => "profileStatuses/index",
         "uses" => "ProfileStatusController@index"
     ]);
@@ -68,7 +68,7 @@ Route::model("device", "Device");
 Route::model("profile_device", "Profile_device");
 
 //get all the devices for the user
-Route::get("devicesForUser/{user_id}", [
+Route::get("device/user/{user_id}", [
         "as"   => "devicesForUser/show",
         "uses" => "ProfileDeviceManagerController@show_users_devices"
     ]);
@@ -87,13 +87,13 @@ Route::post("device", [
 
 
 //update device credentials
-Route::put("device/{device_id}", [
+Route::post("device/update/{device_id}", [
         "as"   => "device/update",
         "uses" => "ProfileDeviceManagerController@update"
     ]);
 
 //remove a device
-Route::delete("device", [
+Route::post("device/delete", [
         "as"   => "device/destroy",
         "uses" => "ProfileDeviceManagerController@destroy"
     ]);
@@ -107,39 +107,48 @@ Route::model("relationship", "Relationship");
 Route::model("relationship_type", "Relationship_type");
 
 //get Relationship Types
-Route::get("relationshipTypes", [
+Route::get("relationship/types", [
         "as"   => "relationshipTypes/show",
         "uses" => "UserRelationshipController@show_all_relationship_types"
     ]);
 
 
 //get pending Friend Requests List
-Route::get("relationshipFriendRequests/{user_id}", [
+Route::get("relationship/requests/{user_id}", [
         "as"   => "relationshipFriendRequests/show",
         "uses" => "UserRelationshipController@show_friend_requests"
     ]);
 
 //get Friend List
-Route::get("relationshipFriends/{user_id}", [
+Route::get("relationship/friends/{user_id}", [
         "as"   => "relationshipFriends/show",
         "uses" => "UserRelationshipController@show_friends"
     ]);
 
 //get Blocked List
-Route::get("relationshipBlockedUsers/{user_id}", [
+Route::get("relationship/blocked/{user_id}", [
         "as"   => "relationshipBlockedUsers/show",
         "uses" => "UserRelationshipController@show_blocked_users"
     ]);
 
 //send Friend Request to user
-Route::post("friendRequest", [
+Route::post("relationship/request", [
         "as"   => "friendRequest/store",
         "uses" => "UserRelationshipController@send_friend_request"
     ]);
 
 //modify Relationship Type (accept/block/ignore Request)
-Route::put("modifyRelationship", [
+Route::post("relationship/modify", [
         "as"   => "modifyRelationship/modify",
         "uses" => "UserRelationshipController@modify_relationship"
     ]);
 
+/*
+ * Watchr Events routes
+ */
+//get Event details
+Route::model("watchr_event", "Watchr_event");
+Route::get("event/{event_id}", [
+        "as"   => "event/show",
+        "uses" => "EventManagerController@get_event_details"
+    ]);
