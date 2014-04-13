@@ -12,15 +12,17 @@
  * @property integer $fk_created_by_user
  * @property integer $fk_event_status
  * @property integer $fk_location
- * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereEventId($value) 
- * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereEventName($value) 
- * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereDescription($value) 
- * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereTimestamp($value) 
- * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereCreatedAt($value) 
- * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereUpdatedAt($value) 
- * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereFkCreatedByUser($value) 
- * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereFkEventStatus($value) 
- * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereFkLocation($value) 
+ * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereEventId($value)
+ * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereEventName($value)
+ * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereDescription($value)
+ * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereTimestamp($value)
+ * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereFkCreatedByUser($value)
+ * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereFkEventStatus($value)
+ * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereFkLocation($value)
+ * @property boolean $hasMedia
+ * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereHasMedia($value)
  */
 class Watchr_event extends \Eloquent {
     protected $fillable = [

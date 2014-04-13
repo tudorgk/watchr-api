@@ -35,7 +35,7 @@ final class CustomValidator
 
     }
 
-    public function isAlphanumeric($str)
+    public function is_lphanumeric($str)
     {
         return ctype_alnum($str);
     }
@@ -50,13 +50,13 @@ final class CustomValidator
             return false;
     }
 
-    public function isValid($table, $column, $value){
+    public function is_valid_id($table, $column, $value){
 
-        $result = DB::table($table)->where($column, '=', $value)->first();
-
-        if($result)
-            return true;
-        else
+        if(is_null($value) || strcmp($value,"") == 0 ||
+            !$this->exists_in_db($table,$column,$value)){
             return false;
+        }
+        else
+            return true;
     }
 }

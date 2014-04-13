@@ -19,23 +19,23 @@ Route::get('/', function()
 //User Profile routes
 Route::model("user", "User_profile");
 
-Route::get("user/all", [
+Route::get("users", [
         "as"   => "user/index",
         "uses" => "UserProfileController@index"
     ]);
-Route::get("user/{user_id}", [
+Route::get("users/{user_id}", [
         "as"   => "user/show",
         "uses" => "UserProfileController@show"
     ]);
-Route::post("user", [
+Route::post("users", [
         "as"   => "user/store",
         "uses" => "UserProfileController@store"
     ]);
-Route::post("user/update/{user_id}", [
+Route::post("users/update/{user_id}", [
         "as"   => "user/update",
         "uses" => "UserProfileController@update"
     ]);
-Route::post("user/delete/{user_id}", [
+Route::post("users/delete/{user_id}", [
         "as"   => "user/destroy",
         "uses" => "UserProfileController@destroy"
     ]);
@@ -148,7 +148,34 @@ Route::post("relationship/modify", [
  */
 //get Event details
 Route::model("watchr_event", "Watchr_event");
-Route::get("event/{event_id}", [
-        "as"   => "event/show",
+Route::model("watchr_category", "Watchr_category");
+Route::model("watchr_event_category", "Watchr_event_category");
+
+Route::get("events/active", [
+        "as"   => "events/show",
+        "uses" => "EventManagerController@get_active_events"
+    ]);
+
+//get a specific event
+Route::get("events/{event_id}", [
+        "as"   => "events/show",
         "uses" => "EventManagerController@get_event_details"
+    ]);
+
+//post a new event
+Route::post("events/new", [
+        "as"   => "events/new",
+        "uses" => "EventManagerController@post_new_event"
+    ]);
+
+//post a new event
+Route::post("events/new_with_media", [
+        "as"   => "events/new_with_media",
+        "uses" => "EventManagerController@post_new_event_with_media"
+    ]);
+
+//destroy an event
+Route::post("events/destroy/{event_id}", [
+        "as"   => "events/destroy",
+        "uses" => "EventManagerController@delete_event"
     ]);

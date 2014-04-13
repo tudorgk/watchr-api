@@ -86,7 +86,7 @@ class UserProfileController extends \BaseController {
         return Response::json(array(
                 "response_msg"=>"Request Ok",
             )
-            ,200);
+            ,201);
 	}
 
 	/**
