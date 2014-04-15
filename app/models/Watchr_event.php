@@ -42,6 +42,10 @@ class Watchr_event extends \Eloquent {
             "fk_location",
         ];
 
+    public function attachments()
+    {
+        return $this->belongsToMany('Attachment','event_attachment' , 'fk_event', 'fk_attachment');
+    }
 
 
 }
