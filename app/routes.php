@@ -179,3 +179,25 @@ Route::post("events/destroy/{event_id}", [
         "as"   => "events/destroy",
         "uses" => "EventManagerController@delete_event"
     ]);
+
+/*
+ * Watchr Conversation methods
+ */
+
+Route::model("conversation", "Conversation");
+Route::model("conversation_reply", "Conversation_reply");
+Route::model("conversation_status", "Conversation_status");
+Route::model("reply_status", "Reply_status");
+
+//Get a conversation stream for an event. It's automatically created on event creation.
+//With optional take() and skip(). Returns all the necessary data for every reply in the stream
+Route::get("events/conversation/{event_id}", [
+        "as"   => "events/conversation/stream",
+        "uses" => "ConversationManagerController@get_conversation_stream"
+    ]);
+
+//Post a new reply to a conversation
+Route::post("events/conversation/reply", [
+        "as"   => "events/conversation/reply",
+        "uses" => "EventManagerController@post_new_reply"
+    ]);

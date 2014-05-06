@@ -216,7 +216,7 @@ class EventManagerController extends \BaseController {
                 "response_msg"=>"Event deleted",
                 "data" => $event_record_2_delete->toArray()
             )
-            ,400);
+            ,200);
 
     }
 
@@ -346,7 +346,7 @@ class EventManagerController extends \BaseController {
                 "response_msg"=>"Requested events",
                 "data" => $response_array
             )
-            ,400);
+            ,200);
 
     }
 

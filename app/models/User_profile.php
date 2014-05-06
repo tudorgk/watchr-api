@@ -42,11 +42,16 @@ class User_profile extends \Eloquent {
 
     protected $primaryKey = "user_id";
 
-    protected $hidden = ["password", "salt"];
+    protected $hidden = ["password", "salt", "fk_photo", "fk_profile_status"];
 
     protected $guarded = [
         "user_id",
         "password",
         "salt"
     ];
+
+    public function photo()
+    {
+        return $this->hasOne('Attachment', 'fk_photo', 'id');
+    }
 }
