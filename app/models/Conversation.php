@@ -8,6 +8,7 @@
  * @property integer $fk_watchr_event
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Conversation_reply[] $replies
  */
 class Conversation extends \Eloquent {
 	protected $fillable = [];

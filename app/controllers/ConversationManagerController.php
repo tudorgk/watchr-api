@@ -52,6 +52,7 @@ class ConversationManagerController extends \BaseController {
         if ($_count != null && $_skip!=null){
             //if we have a paginated query, get the selected replies
             $reply_query = $conversation->replies()
+                ->where('fk_reply_status', '=', '1')
                 ->oldest()
                 ->skip($_skip)
                 ->take($_count)
@@ -61,6 +62,7 @@ class ConversationManagerController extends \BaseController {
             //get all the "ok" (fk_reply_status == 1) replies to the conversation.
             //join all the profile user data
             $reply_query = $conversation->replies()
+                ->where('fk_reply_status', '=', '1')
                 ->oldest()
                 ->get();
        }
@@ -106,6 +108,103 @@ class ConversationManagerController extends \BaseController {
 
 	}
 
+    /**
+     * Post a new reply to the event's conversation.
+     * @internal int user_id
+     * @internal int conversation_id
+     * @internal string text
+     * @return Response
+     */
 
+    public function post_new_reply(){
 
+        $validator = CustomValidator::Instance();
+
+        //getting the required variables from POST
+        $_user_id= Input::get("user_id");
+        $_conversation_id = Input::get("conversation_id");
+        $_text = Input::get("text");
+
+        if(!$validator->is_valid_id('user_profile', 'user_id' , $_user_id)){
+            return Response::json(array(
+                    "response_msg"=>"Invalid user id",
+                )
+                ,400);
+        }
+
+        if(!$validator->is_valid_id('conversation', 'conversation_id' , $_conversation_id)){
+            return Response::json(array(
+                    "response_msg"=>"Invalid conversation id",
+                )
+                ,400);
+        }
+
+        if(!$validator->is_valid_string($_text,500)){
+            return Response::json(array(
+                    "response_msg"=>"Text empty or out of scope",
+                )
+                ,400);
+        }
+
+        //after sanity check, create a new entry in the conversation_reply table
+        $reply = new Conversation_reply();
+        $reply->reply_text = $_text;
+        $reply->fk_conversation = $_conversation_id;
+        $reply->fk_user = $_user_id;
+        $reply->fk_reply_status = 1; //it's ok
+        $reply->save();
+
+        return Response::json(array(
+                "response_msg"=>"Reply posted",
+                "data" => $reply->toArray()
+            )
+            ,201);
+
+    }
+
+    /**
+     * Delete a reply from the event's conversation.
+     * @internal int user_id
+     * @internal int reply_id
+     * @return Response
+     */
+
+    public function delete_reply(){
+        $validator = CustomValidator::Instance();
+
+        //getting the required variables from POST
+        $_user_id= Input::get("user_id");
+        $_reply_id = Input::get("reply_id");
+
+        if(!$validator->is_valid_id('user_profile', 'user_id' , $_user_id)){
+            return Response::json(array(
+                    "response_msg"=>"Invalid user id",
+                )
+                ,400);
+        }
+
+        if(!$validator->is_valid_id('conversation_reply', 'reply_id' , $_reply_id)){
+            return Response::json(array(
+                    "response_msg"=>"Invalid reply id",
+                )
+                ,400);
+        }
+
+        $reply_to_delete = Conversation_reply::find($_reply_id);
+
+        if($reply_to_delete->fk_user != $_user_id){
+            return Response::json(array(
+                    "response_msg"=>"Invalid creator id",
+                )
+                ,400);
+        }
+
+        $reply_to_delete->fk_reply_status = 2; //set it to delete
+        $reply_to_delete->save();
+
+        return Response::json(array(
+                "response_msg"=>"Reply deleted"
+            )
+            ,200);
+    }
 }

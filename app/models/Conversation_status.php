@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Conversation_status
+ *
+ * @property integer $id
+ * @property string $status
+ */
 class Conversation_status extends \Eloquent {
 	protected $fillable = [];
 
@@ -7,5 +13,5 @@ class Conversation_status extends \Eloquent {
 
     protected $primaryKey = "id";
 
-    protected $timestamps = false;
+    public $timestamps = false;
 }

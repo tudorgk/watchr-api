@@ -23,6 +23,7 @@
  * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereFkLocation($value)
  * @property boolean $hasMedia
  * @method static \Illuminate\Database\Query\Builder|\Watchr_event whereHasMedia($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Attachment[] $attachments
  */
 class Watchr_event extends \Eloquent {
     protected $fillable = [

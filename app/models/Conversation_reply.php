@@ -10,6 +10,7 @@
  * @property integer $fk_user
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ * @property-read \Conversation $conversation
  */
 class Conversation_reply extends \Eloquent {
     protected $fillable = [];

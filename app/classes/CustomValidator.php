@@ -59,4 +59,13 @@ final class CustomValidator
         else
             return true;
     }
+
+    public function is_valid_string($string, $length = 80){
+        if(is_null($string) || strcmp($string,"") == 0 || strlen($string) >$length)
+            return false;
+        else
+            return true;
+
+
+    }
 }

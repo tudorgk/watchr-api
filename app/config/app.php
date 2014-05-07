@@ -108,8 +108,7 @@ return array(
 		'Illuminate\Workbench\WorkbenchServiceProvider',
 		'Way\Generators\GeneratorsServiceProvider',
 		'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider',
-		'Rtablada\PackageInstaller\PackageInstallerServiceProvider',
-		'LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider',
+		'Rtablada\PackageInstaller\PackageInstallerServiceProvider'
 
 	),
 
@@ -175,9 +174,7 @@ return array(
 		'Str' => 'Illuminate\Support\Str',
 		'URL' => 'Illuminate\Support\Facades\URL',
 		'Validator' => 'Illuminate\Support\Facades\Validator',
-		'View' => 'Illuminate\Support\Facades\View',
-		'AuthorizationServer' => 'LucaDegasperi\OAuth2Server\Facades\AuthorizationServerFacade',
-		'ResourceServer' => 'LucaDegasperi\OAuth2Server\Facades\ResourceServerFacade',
+		'View' => 'Illuminate\Support\Facades\View'
 
 	),
 

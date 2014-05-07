@@ -11,10 +11,10 @@
 |
 */
 
-Route::get('/', function()
-{
-	return View::make('hello');
-});
+/*
+ * Authorization
+ *
+ */
 
 //User Profile routes
 Route::model("user", "User_profile");
@@ -197,7 +197,13 @@ Route::get("events/conversation/{event_id}", [
     ]);
 
 //Post a new reply to a conversation
-Route::post("events/conversation/reply", [
-        "as"   => "events/conversation/reply",
-        "uses" => "EventManagerController@post_new_reply"
+Route::post("events/conversation/reply/new", [
+        "as"   => "events/conversation/reply/new",
+        "uses" => "ConversationManagerController@post_new_reply"
+    ]);
+
+//Delete a user's reply
+Route::post("events/conversation/reply/destroy", [
+        "as"   => "events/conversation/reply/destroy",
+        "uses" => "ConversationManagerController@delete_reply"
     ]);
