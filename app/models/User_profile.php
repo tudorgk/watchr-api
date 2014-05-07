@@ -30,6 +30,7 @@
  * @method static \Illuminate\Database\Query\Builder|\User_profile whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\User_profile whereUpdatedAt($value)
  * @property-read \Attachment $photo
+ * @property string $remember_token
  */
 class User_profile extends \Eloquent {
 	protected $fillable = [
