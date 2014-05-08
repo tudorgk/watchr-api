@@ -22,23 +22,38 @@ App::singleton('oauth2', function() {
             'dsn' => 'mysql:dbname=watchr_db;host=localhost',
             'username' => 'root',
             'password' => '50centrulzz'));
-        $server = new OAuth2\Server($storage);
+
+       $server = new OAuth2\Server($storage, array(
+            'always_issue_new_refresh_token' => true,
+            'refresh_token_lifetime'         => 2419200,
+        ));
 
         $server->addGrantType(new OAuth2\GrantType\ClientCredentials($storage));
         $server->addGrantType(new OAuth2\GrantType\UserCredentials($storage));
+        // create the grant type
+        $grantType = new OAuth2\GrantType\RefreshToken($storage);
+        // add the grant type to your OAuth server
+        $server->addGrantType($grantType);
 
         return $server;
     });
 
-Route::post('oauth/token', function()
-    {
-        $bridgedRequest  = OAuth2\HttpFoundationBridge\Request::createFromRequest(Request::instance());
-        $bridgedResponse = new OAuth2\HttpFoundationBridge\Response();
+Route::post('oauth/token', [
+        "as"   => "oauth/token",
+        "uses" => "OAuthTokenController@getToken"
+    ]);
 
-        $bridgedResponse = App::make('oauth2')->handleTokenRequest($bridgedRequest, $bridgedResponse);
+Route::get("oauth/resource", [
+        "as"   => "oauth/resource",
+        "uses" => "OAuthResourceController@getResource"
+    ]);
 
-        return $bridgedResponse;
-    });
+Route::get("oauth/authorize", [
+        "as"   => "oauth/authorize",
+        "uses" => "OAuthAuthorizeController@authorize"
+    ]);
+
+
 
 //User Profile routes
 Route::model("user", "User_profile");

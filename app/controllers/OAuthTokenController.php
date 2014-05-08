@@ -1,16 +1,21 @@
 <?php
 
-class OAuthController extends \BaseController {
+class OAuthTokenController extends \BaseController {
 
 	/**
-	 * Display a listing of the resource.
-	 * GET /oauth
-	 *
+	 * Get a token from grant_type
+	 * GET /oauth/token
+	 * @internal string grant_type
 	 * @return Response
 	 */
-	public function index()
+	public function getToken()
 	{
-		//
+        $bridgedRequest  = OAuth2\HttpFoundationBridge\Request::createFromRequest(Request::instance());
+        $bridgedResponse = new OAuth2\HttpFoundationBridge\Response();
+
+        $bridgedResponse = App::make('oauth2')->handleTokenRequest($bridgedRequest, $bridgedResponse);
+
+        return $bridgedResponse;
 	}
 
 	/**
