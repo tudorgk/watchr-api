@@ -16,6 +16,7 @@
  *
  */
 
+/*
 App::singleton('oauth2', function() {
 
         $storage = new OAuth2\Storage\Pdo(array(
@@ -37,21 +38,70 @@ App::singleton('oauth2', function() {
 
         return $server;
     });
+*/
 
-Route::post('oauth/token', [
-        "as"   => "oauth/token",
-        "uses" => "OAuthTokenController@getToken"
-    ]);
+Route::post('oauth/access_token', function()
+    {
+        return AuthorizationServer::performAccessTokenFlow();
+    });
 
-Route::get("oauth/resource", [
-        "as"   => "oauth/resource",
-        "uses" => "OAuthResourceController@getResource"
-    ]);
+//Route::get('/oauth/authorize', array('before' => 'check-authorization-params|auth', function()
+//    {
+//        // get the data from the check-authorization-params filter
+//        $params = Session::get('authorize-params');
+//
+//        // get the user id
+//        $params['user_id'] = Auth::user()->user_id;
+//
+//        // display the authorization form
+////        return View::make('authorization-form', array('params' => $params));
+//        echo('display form');
+//
+//    }));
+//
+//
+//Route::post('/oauth/authorize', array('before' => 'check-authorization-params|auth|csrf', function()
+//    {
+//        // get the data from the check-authorization-params filter
+//        $params = Session::get('authorize-params');
+//
+//        // get the user id
+//        $params['user_id'] = Auth::user()->user_id;
+//
+//        // check if the user approved or denied the authorization request
+//        if (Input::get('approve') !== null) {
+//
+//            $code = AuthorizationServer::newAuthorizeRequest('user', $params['user_id'], $params);
+//
+//            Session::forget('authorize-params');
+//
+//            var_dump($code);
+//
+//            return Redirect::to(AuthorizationServer::makeRedirectWithCode($code, $params));
+//        }
+//
+//        if (Input::get('deny') !== null) {
+//
+//            Session::forget('authorize-params');
+//
+//            return Redirect::to(AuthorizationServer::makeRedirectWithError($params));
+//        }
+//    }));
 
-Route::get("oauth/authorize", [
-        "as"   => "oauth/authorize",
-        "uses" => "OAuthAuthorizeController@authorize"
-    ]);
+//Route::post('oauth/token', [
+//        "as"   => "oauth/token",
+//        "uses" => "OAuthTokenController@getToken"
+//    ]);
+//
+//Route::get("oauth/resource", [
+//        "as"   => "oauth/resource",
+//        "uses" => "OAuthResourceController@getResource"
+//    ]);
+//
+//Route::get("oauth/authorize", [
+//        "as"   => "oauth/authorize",
+//        "uses" => "OAuthAuthorizeController@authorize"
+//    ]);
 
 
 

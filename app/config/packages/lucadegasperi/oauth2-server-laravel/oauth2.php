@@ -70,9 +70,9 @@ return array(
             'class'            => 'League\OAuth2\Server\Grant\Password',
             'access_token_ttl' => 604800,
             'callback'         => function ($username, $password) {
-                
+
                 $credentials = array(
-                    'email' => $username,
+                    'username' => $username,
                     'password' => $password,
                 );
 
@@ -82,7 +82,7 @@ return array(
                     return false;
                 }
 
-                return Auth::getProvider()->retrieveByCredentials($credentials)->id;
+                return Auth::getProvider()->retrieveByCredentials($credentials)->user_id;
             }
         ),
 

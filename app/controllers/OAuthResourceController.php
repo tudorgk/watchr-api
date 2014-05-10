@@ -1,21 +1,21 @@
 <?php
 
-class OAuthTokenController extends \BaseController {
+class OAuthResourceController extends \BaseController {
 
 	/**
-	 * Get a token from grant_type
-	 * GET /oauth/token
-	 * @internal string grant_type
+	 * Get Resource example
+	 * GET /oauth/resource
+	 * @internal string access_token
 	 * @return Response
 	 */
-	public function getToken()
+	public function getResource()
 	{
 
 	}
 
 	/**
 	 * Show the form for creating a new resource.
-	 * GET /oauth/create
+	 * GET /oauthresource/create
 	 *
 	 * @return Response
 	 */
@@ -26,7 +26,7 @@ class OAuthTokenController extends \BaseController {
 
 	/**
 	 * Store a newly created resource in storage.
-	 * POST /oauth
+	 * POST /oauthresource
 	 *
 	 * @return Response
 	 */
@@ -37,7 +37,7 @@ class OAuthTokenController extends \BaseController {
 
 	/**
 	 * Display the specified resource.
-	 * GET /oauth/{id}
+	 * GET /oauthresource/{id}
 	 *
 	 * @param  int  $id
 	 * @return Response
@@ -49,7 +49,7 @@ class OAuthTokenController extends \BaseController {
 
 	/**
 	 * Show the form for editing the specified resource.
-	 * GET /oauth/{id}/edit
+	 * GET /oauthresource/{id}/edit
 	 *
 	 * @param  int  $id
 	 * @return Response
@@ -61,7 +61,7 @@ class OAuthTokenController extends \BaseController {
 
 	/**
 	 * Update the specified resource in storage.
-	 * PUT /oauth/{id}
+	 * PUT /oauthresource/{id}
 	 *
 	 * @param  int  $id
 	 * @return Response
@@ -73,7 +73,7 @@ class OAuthTokenController extends \BaseController {
 
 	/**
 	 * Remove the specified resource from storage.
-	 * DELETE /oauth/{id}
+	 * DELETE /oauthresource/{id}
 	 *
 	 * @param  int  $id
 	 * @return Response

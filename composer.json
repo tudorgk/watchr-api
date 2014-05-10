@@ -9,10 +9,10 @@
 		"barryvdh/laravel-ide-helper": "1.*",
 		"rtablada/package-installer": "dev-master",
         "bshaffer/oauth2-server-php": "dev-master",
-        "bshaffer/oauth2-server-httpfoundation-bridge": "dev-master",
         "zetacomponents/database": "1.4.6",
         "guzzlehttp/guzzle": "dev-master",
-        "phpunit/phpunit": "4.1.*"
+        "phpunit/phpunit": "4.1.*",
+		"lucadegasperi/oauth2-server-laravel": "dev-master"
 	},
 	"autoload": {
 		"classmap": [

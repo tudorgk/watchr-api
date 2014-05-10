@@ -32,7 +32,10 @@
  * @property-read \Attachment $photo
  * @property string $remember_token
  */
-class User_profile extends \Eloquent {
+use Illuminate\Auth\UserInterface;
+use Illuminate\Auth\Reminders\RemindableInterface;
+
+class User_profile extends \Eloquent implements UserInterface, RemindableInterface {
 	protected $fillable = [
         "username",
         "email",
@@ -55,5 +58,45 @@ class User_profile extends \Eloquent {
     public function photo()
     {
         return $this->hasOne('Attachment', 'fk_photo', 'id');
+    }
+
+    public function getAuthIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Get the password for the user.
+     *
+     * @return string
+     */
+    public function getAuthPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * Get the e-mail address where password reminders are sent.
+     *
+     * @return string
+     */
+    public function getReminderEmail()
+    {
+        return $this->email;
+    }
+
+    public function getRememberToken()
+    {
+        return $this->remember_token;
+    }
+
+    public function setRememberToken($value)
+    {
+        $this->remember_token = $value;
+    }
+
+    public function getRememberTokenName()
+    {
+        return 'remember_token';
     }
 }
