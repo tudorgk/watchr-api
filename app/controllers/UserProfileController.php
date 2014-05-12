@@ -38,46 +38,37 @@ class UserProfileController extends \BaseController {
 	{
 
         //sanity checks
-        if(is_null(Input::get("username")) || strcmp(Input::get("username"),"") == 0){
+        $validator = Validator::make(
+            array(
+                'username' => Input::get("username"),
+                'email' => Input::get("email"),
+                'password' => Input::get("password"),
+                'country' => Input::get("country"),
+                'gender' => Input::get("gender")
+            ),
+            array(
+                'username' => 'required|unique:user_profile,username',
+                'password' => 'required|min:8',
+                'email' => 'required|email|unique:user_profile,email',
+                'country' => 'required|integer|exists:country_t,country_id',
+                'gender' => 'required|integer'
+            )
+        );
+
+        if($validator->fails()){
             return Response::json(array(
-                    "response_msg"=>"Username field empty or not set",
+                    "error"=>$validator->messages()->all(),
                 )
                 ,400);
         }
 
-        if(is_null(Input::get("email")) || strcmp(Input::get("email"),"") == 0){
-            return Response::json(array(
-                    "response_msg"=>"Email field empty or not set",
-                )
-                ,400);
-        }
-
-        if(is_null(Input::get("password")) || strcmp(Input::get("password"),"") == 0){
-            return Response::json(array(
-                    "response_msg"=>"Password field empty or not set",
-                )
-                ,400);
-        }
-
-        $validator = CustomValidator::Instance();
-        if($validator->exists_in_db('user_profile','username',Input::get("username"))){
-            return Response::json(array(
-                    "response_msg"=>"Username already exists",
-                )
-                ,400);
-        }
-        if($validator->exists_in_db('user_profile','email',Input::get("email"))){
-            return Response::json(array(
-                    "response_msg"=>"Email already exists",
-                )
-                ,400);
-        }
 
         //creating a new user
         $user = new User_profile();
         $user->username = Input::get("username");
         $user->fk_country = Input::get("country");
-        $user->fk_gender = Input::get("gender");
+        $user->fk_profile_status = 1;
+        $user->gender = Input::get("gender");
         $user->first_name = Input::get("first_name");
         $user->email = Input::get("email");
         $user->password = Hash::make(Input::get("password"));
@@ -98,12 +89,27 @@ class UserProfileController extends \BaseController {
 	public function show($_user_id)
     {
 
-        var_dump(Input::get('access_token'));
-        $ownerId = ResourceServer::getOwnerId();
-        var_dump($ownerId);
 
-        if(is_numeric($_user_id)){
-            $user = User_profile::where('user_id',$_user_id)->get(array(
+
+
+
+        $validator = Validator::make(array(
+                'userId' => $_user_id
+            ),array(
+                'userId' => 'required|integer|exists:user_profile,user_id'
+            ));
+
+        if($validator->fails()){
+            return Response::json(array(
+                    "error"=>$validator->messages()->all(),
+                )
+                ,400);
+        }
+
+        //get owner id from OAuth
+        $ownerId = ResourceServer::getOwnerId();
+
+        $user = User_profile::where('user_id',$_user_id)->get(array(
                     'user_id',
                     'username',
                     'email',
@@ -111,21 +117,14 @@ class UserProfileController extends \BaseController {
                     'last_name',
                     'created_at'
                 ));
-        }else{
-            return Response::json(array("message"=>"ID is not a numeric value"),400);
-        }
-        if(!$user->isEmpty())
-        {
-            return Response::json(
+
+
+        return Response::json(
                 array(
                     "message"=>"Request Ok",
                     "data" => $user->toArray())
                 ,200);
-        }
-        else
-        {
-            return Response::json(array("message"=>"User not found"),404);
-        }
+
     }
 
 	/**

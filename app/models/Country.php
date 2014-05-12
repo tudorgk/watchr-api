@@ -28,4 +28,9 @@ class Country extends \Eloquent {
     protected $table = "country_t";
 
     protected $primaryKey = "country_id";
+
+    public function users()
+    {
+        return $this->belongsToMany('User_profile','fk_country');
+    }
 }

@@ -110,10 +110,16 @@ Route::get('secure-route', array('before' => 'oauth', function(){
 
 //User Profile routes
 
+Route::post("users", [
+        "as"   => "user/store",
+        "uses" => "UserProfileController@store"
+    ]);
+
 Route::group(array('before' => 'oauth'), function()
     {
+//User Profile routes
+
         Route::get("users", array(
-                'before' => 'oauth',
                 "as"   => "user/index",
                 "uses" => "UserProfileController@index"
             ));
@@ -121,14 +127,12 @@ Route::group(array('before' => 'oauth'), function()
                 "as"   => "user/show",
                 "uses" => "UserProfileController@show"
             ]);
-        Route::post("users", [
-                "as"   => "user/store",
-                "uses" => "UserProfileController@store"
-            ]);
+
         Route::post("users/update/{user_id}", [
                 "as"   => "user/update",
                 "uses" => "UserProfileController@update"
             ]);
+
         Route::post("users/delete/{user_id}", [
                 "as"   => "user/destroy",
                 "uses" => "UserProfileController@destroy"
@@ -137,7 +141,6 @@ Route::group(array('before' => 'oauth'), function()
 
 
 //Country routes
-
 Route::get("country/all", [
         "as"   => "countries/index",
         "uses" => "CountryController@index"

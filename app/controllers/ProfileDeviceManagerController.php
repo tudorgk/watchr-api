@@ -30,6 +30,9 @@ class ProfileDeviceManagerController extends \BaseController {
 	public function store()
 	{
 
+        //get owner id from OAuth
+        $ownerId = ResourceServer::getOwnerId();
+
         $validator = CustomValidator::Instance();
 
         //extracting variables
@@ -40,39 +43,32 @@ class ProfileDeviceManagerController extends \BaseController {
         $device_token = Input::get("device_token");
 
         //sanity checks
-        if(is_null($brand) || strcmp($brand,"") == 0){
+
+        $validator = Validator::make(
+            array(
+                'brand' => $brand,
+                'user_id' => $user_id,
+                'model' => $model,
+                'device_uid' => $device_uid
+            ),
+            array(
+                'brand' => 'required',
+                'user_id' => 'required|integer|exists:user_profile,user_id',
+                'model' => 'required',
+                'device_uid' => 'required|unique:device,device_id',
+            )
+        );
+
+        if($validator->fails()){
             return Response::json(array(
-                    "response_msg"=>"Brand field empty or not set",
+                    "error"=>$validator->messages()->all(),
                 )
                 ,400);
         }
 
-        if(is_null($user_id) || strcmp($user_id,"") == 0 ||
-            !is_numeric($user_id) || !$validator->exists_in_db('user_profile', 'user_id',$user_id )){
+        if($ownerId != $user_id){
             return Response::json(array(
-                    "response_msg"=>"Invalid User ID",
-                )
-                ,400);
-        }
-
-        if(is_null($model) || strcmp($model,"") == 0){
-            return Response::json(array(
-                    "response_msg"=>"Model field empty or not set",
-                )
-                ,400);
-        }
-
-        if(is_null($device_uid) || strcmp($device_uid,"") == 0){
-            return Response::json(array(
-                    "response_msg"=>"Device UID field empty or not set",
-                )
-                ,400);
-        }
-
-        //TODO: Need to modify the 'already exists' checking method
-        if($validator->exists_in_db('device','device_uid',$device_uid)){
-            return Response::json(array(
-                    "response_msg"=>"Device already exists",
+                    "error"=>"You don't have access to add devices to this user",
                 )
                 ,400);
         }
@@ -109,29 +105,41 @@ class ProfileDeviceManagerController extends \BaseController {
 	public function show($device_id)
 	{
 
-        if(is_numeric($device_id)){
-            $result = Device::find($device_id);
+        $validator = Validator::make(
+            array(
+                'device_id' => $device_id,
+            ),
+            array(
+                'device_id' => 'required|integer|exists:device,device_id|exists:profile_device,fk_device',
+            )
+        );
 
-            if($result){
-                return Response::json(
-                 array(
-                        "response_msg"=>"Request Ok",
-                        "data" => $result->toArray())
-                    ,200);
-            }else{
-                return Response::json(
-                    array(
-                        "response_msg"=>"Request Ok",
-                        "data" => array())
-                    ,200);
-            }
-        }else{
-            return Response::json(
-                array(
-                    "response_msg"=>"Invalid device id",
+        if($validator->fails()){
+            return Response::json(array(
+                    "error"=>$validator->messages()->all(),
                 )
                 ,400);
         }
+
+        //get owner id from OAuth
+        $ownerId = ResourceServer::getOwnerId();
+
+        $profile_device = Profile_device::where('fk_device','=',$device_id)->first();
+
+        if($profile_device->fk_user_profile != $ownerId){
+            return Response::json(array(
+                    "error"=>"You don't have access to view the device for this user",
+                )
+                ,400);
+        }
+
+        $result = Device::find($device_id);
+        return Response::json(
+            array(
+                "response_msg"=>"Request Ok",
+                "data" => $result->toArray())
+            ,200);
+
 	}
 
     /**
@@ -142,12 +150,25 @@ class ProfileDeviceManagerController extends \BaseController {
      */
     public function show_users_devices($user_id)
     {
-        $validator = CustomValidator::Instance();
+        $validator = Validator::make(array(
+                'user_id' => $user_id
+            ),array(
+                'user_id' => 'required|integer|exists:user_profile,user_id'
+            ));
 
-        if(is_null($user_id) || strcmp($user_id,"") == 0 ||
-            !is_numeric($user_id) || !$validator->exists_in_db('user_profile', 'user_id',$user_id )){
+        if ($validator->fails()){
             return Response::json(array(
-                    "response_msg"=>"Invalid User ID",
+                    "error"=>$validator->messages()->all(),
+                )
+                ,400);
+        }
+
+        //get owner id from OAuth
+        $ownerId = ResourceServer::getOwnerId();
+
+        if($ownerId != $user_id){
+            return Response::json(array(
+                    "error"=>"You don't have access to add devices to this user",
                 )
                 ,400);
         }
@@ -182,15 +203,6 @@ class ProfileDeviceManagerController extends \BaseController {
 	 */
 	public function update($device_id)
 	{
-        $validator = CustomValidator::Instance();
-
-        if(is_null($device_id) || strcmp($device_id,"") == 0 ||
-            !is_numeric($device_id) || !$validator->exists_in_db('device', 'device_id',$device_id )){
-            return Response::json(array(
-                    "response_msg"=>"Invalid Device ID",
-                )
-                ,400);
-        }
 
         //extracting variables
         $brand = Input::get("brand");
@@ -198,27 +210,37 @@ class ProfileDeviceManagerController extends \BaseController {
         $device_uid = Input::get("device_uid");
         $device_token = Input::get("device_token");
 
-        //sanity checks
-        if(is_null($brand) || strcmp($brand,"") == 0){
+        $validator = Validator::make(array(
+                'device_id' => $device_id,
+                'brand' => $brand,
+                'model' => $model,
+                'device_uid' => $device_uid
+            ),array(
+                'device_id' => 'required|integer|exists:device',
+                'brand' => 'required',
+                'model' => 'required',
+                'device_uid' => 'required|unique:device,device_id',
+            ));
+
+        if ($validator->fails()){
             return Response::json(array(
-                    "response_msg"=>"Brand field empty or not set",
+                    "error"=>$validator->messages()->all(),
                 )
                 ,400);
         }
 
-        if(is_null($model) || strcmp($model,"") == 0){
+        //get owner id from OAuth
+        $ownerId = ResourceServer::getOwnerId();
+
+        $profile_device = Profile_device::where('fk_device','=',$device_id)->first();
+
+        if($ownerId != $profile_device->fk_user_profile){
             return Response::json(array(
-                    "response_msg"=>"Model field empty or not set",
+                    "error"=>"You don't have access to update devices for this user",
                 )
                 ,400);
         }
 
-        if(is_null($device_uid) || strcmp($device_uid,"") == 0){
-            return Response::json(array(
-                    "response_msg"=>"Device UID field empty or not set",
-                )
-                ,400);
-        }
 
         $device = Device::find($device_id);
 
@@ -242,21 +264,39 @@ class ProfileDeviceManagerController extends \BaseController {
 	 */
 	public function destroy()
 	{
-		$validator = CustomValidator::Instance();
         $device_id = Input::get('device_id');
 
-        if(is_null($device_id) || strcmp($device_id,"") == 0 ||
-            !is_numeric($device_id) || !$validator->exists_in_db('device', 'device_id',$device_id )){
+        $validator = Validator::make(array(
+                'device_id' => $device_id
+            ),array(
+                'device_id' => 'required|integer|exists:device'
+            ));
+
+        if ($validator->fails()){
             return Response::json(array(
-                    "response_msg"=>"Invalid Device ID",
+                    "error"=>$validator->messages()->all(),
+                )
+                ,400);
+        }
+
+        //get owner id from OAuth
+        $ownerId = ResourceServer::getOwnerId();
+
+        $profile_device = Profile_device::where('fk_device','=',$device_id)->first();
+
+        if($ownerId != $profile_device->fk_user_profile){
+            return Response::json(array(
+                    "error"=>"You don't have access to update devices for this user",
                 )
                 ,400);
         }
 
         //TODO: Check database implementation for deletion constraint
         $device_record = Device::find($device_id);
-        if($device_record)
-            $device_record->delete();
+
+        $profile_device->delete();
+        $device_record->delete();
+
 
         return Response::json(array(
                 "response_msg"=>"Request Ok",

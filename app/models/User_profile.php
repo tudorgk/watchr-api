@@ -47,13 +47,16 @@ class User_profile extends \Eloquent implements UserInterface, RemindableInterfa
 
     protected $primaryKey = "user_id";
 
-    protected $hidden = ["password", "salt", "fk_photo", "fk_profile_status"];
+    protected $hidden = ["password", "fk_photo", "fk_profile_status"];
 
     protected $guarded = [
         "user_id",
-        "password",
-        "salt"
+        "password"
     ];
+
+    public function country(){
+        return $this->hasOne('Country', 'fk_country', 'country_id');
+    }
 
     public function photo()
     {
