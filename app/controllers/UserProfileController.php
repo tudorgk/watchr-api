@@ -97,6 +97,11 @@ class UserProfileController extends \BaseController {
 	 */
 	public function show($_user_id)
     {
+
+        var_dump(Input::get('access_token'));
+        $ownerId = ResourceServer::getOwnerId();
+        var_dump($ownerId);
+
         if(is_numeric($_user_id)){
             $user = User_profile::where('user_id',$_user_id)->get(array(
                     'user_id',

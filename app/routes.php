@@ -45,6 +45,7 @@ Route::post('oauth/access_token', function()
         return AuthorizationServer::performAccessTokenFlow();
     });
 
+
 //Route::get('/oauth/authorize', array('before' => 'check-authorization-params|auth', function()
 //    {
 //        // get the data from the check-authorization-params filter
@@ -103,34 +104,39 @@ Route::post('oauth/access_token', function()
 //        "uses" => "OAuthAuthorizeController@authorize"
 //    ]);
 
-
+Route::get('secure-route', array('before' => 'oauth', function(){
+        return "oauth secured route";
+    }));
 
 //User Profile routes
-Route::model("user", "User_profile");
 
-Route::get("users", [
-        "as"   => "user/index",
-        "uses" => "UserProfileController@index"
-    ]);
-Route::get("users/{user_id}", [
-        "as"   => "user/show",
-        "uses" => "UserProfileController@show"
-    ]);
-Route::post("users", [
-        "as"   => "user/store",
-        "uses" => "UserProfileController@store"
-    ]);
-Route::post("users/update/{user_id}", [
-        "as"   => "user/update",
-        "uses" => "UserProfileController@update"
-    ]);
-Route::post("users/delete/{user_id}", [
-        "as"   => "user/destroy",
-        "uses" => "UserProfileController@destroy"
-    ]);
+Route::group(array('before' => 'oauth'), function()
+    {
+        Route::get("users", array(
+                'before' => 'oauth',
+                "as"   => "user/index",
+                "uses" => "UserProfileController@index"
+            ));
+        Route::get("users/{user_id}", [
+                "as"   => "user/show",
+                "uses" => "UserProfileController@show"
+            ]);
+        Route::post("users", [
+                "as"   => "user/store",
+                "uses" => "UserProfileController@store"
+            ]);
+        Route::post("users/update/{user_id}", [
+                "as"   => "user/update",
+                "uses" => "UserProfileController@update"
+            ]);
+        Route::post("users/delete/{user_id}", [
+                "as"   => "user/destroy",
+                "uses" => "UserProfileController@destroy"
+            ]);
+
+
 
 //Country routes
-Route::model("country", "Country");
 
 Route::get("country/all", [
         "as"   => "countries/index",
@@ -143,7 +149,6 @@ Route::get("country/{country_id}", [
 
 
 //profile_statuses routes
-Route::model("profile_status", "Profile_status");
 
 Route::get("profile_status/all", [
         "as"   => "profileStatuses/index",
@@ -153,8 +158,7 @@ Route::get("profile_status/all", [
 /*
  * device Profile routes
  */
-Route::model("device", "Device");
-Route::model("profile_device", "Profile_device");
+
 
 //get all the devices for the user
 Route::get("device/user/{user_id}", [
@@ -192,8 +196,7 @@ Route::post("device/delete", [
 /*
  * User Relationships routes
  */
-Route::model("relationship", "Relationship");
-Route::model("relationship_type", "Relationship_type");
+
 
 //get Relationship Types
 Route::get("relationship/types", [
@@ -236,9 +239,7 @@ Route::post("relationship/modify", [
  * Watchr Events routes
  */
 //get Event details
-Route::model("watchr_event", "Watchr_event");
-Route::model("watchr_category", "Watchr_category");
-Route::model("watchr_event_category", "Watchr_event_category");
+
 
 Route::get("events/active", [
         "as"   => "events/show",
@@ -273,10 +274,6 @@ Route::post("events/destroy/{event_id}", [
  * Watchr Conversation methods
  */
 
-Route::model("conversation", "Conversation");
-Route::model("conversation_reply", "Conversation_reply");
-Route::model("conversation_status", "Conversation_status");
-Route::model("reply_status", "Reply_status");
 
 //Get a conversation stream for an event. It's automatically created on event creation.
 //With optional take() and skip(). Returns all the necessary data for every reply in the stream
@@ -296,3 +293,26 @@ Route::post("events/conversation/reply/destroy", [
         "as"   => "events/conversation/reply/destroy",
         "uses" => "ConversationManagerController@delete_reply"
     ]);
+
+    });
+
+Route::model("user", "User_profile");
+
+Route::model("profile_status", "Profile_status");
+
+Route::model("country", "Country");
+
+Route::model("device", "Device");
+Route::model("profile_device", "Profile_device");
+
+Route::model("relationship", "Relationship");
+Route::model("relationship_type", "Relationship_type");
+
+Route::model("watchr_event", "Watchr_event");
+Route::model("watchr_category", "Watchr_category");
+Route::model("watchr_event_category", "Watchr_event_category");
+
+Route::model("conversation", "Conversation");
+Route::model("conversation_reply", "Conversation_reply");
+Route::model("conversation_status", "Conversation_status");
+Route::model("reply_status", "Reply_status");
