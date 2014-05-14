@@ -9,34 +9,36 @@ class UserRelationshipController extends \BaseController {
 	 */
 	public function send_friend_request()
 	{
-        //get friend request relationship type id
-        $friend_request_type_pending = Relationship_type::select('relationship_type_id')
-          ->where('name','=','pending')->first();
-        $validator = CustomValidator::Instance();
-
         //extracting variables
         $user_id = Input::get("user_id");
         $friend_user_id = Input::get("friend_user_id");
 
-        if(is_null($user_id) || strcmp($user_id,"") == 0 ||
-            !is_numeric($user_id) || !$validator->exists_in_db('user_profile', 'user_id',$user_id )){
+        //get friend request relationship type id
+        $friend_request_type_pending = Relationship_type::select('relationship_type_id')
+          ->where('name','=','pending')->first();
+
+
+        $validator = Validator::make(array(
+                'user_id' => $user_id,
+                'friend_user_id' => $friend_user_id
+            ),array(
+                'user_id' => 'required|integer|exists:user_profile,user_id',
+                'friend_user_id' => 'required|integer|exists:user_profile,user_id|different:user_id'
+            ));
+
+        if ($validator->fails()){
             return Response::json(array(
-                    "response_msg"=>"Invalid User ID",
+                    "error"=>$validator->messages()->all(),
                 )
                 ,400);
         }
 
-        if(is_null($friend_user_id) || strcmp($friend_user_id,"") == 0 ||
-            !is_numeric($friend_user_id) || !$validator->exists_in_db('user_profile', 'user_id',$friend_user_id )){
-            return Response::json(array(
-                    "response_msg"=>"Invalid Friend User ID",
-                )
-                ,400);
-        }
+        //get owner id from OAuth
+        $ownerId = ResourceServer::getOwnerId();
 
-        if(strcmp($user_id, $friend_user_id)== 0){
+        if($ownerId != $user_id){
             return Response::json(array(
-                    "response_msg"=>"User ID and Friend User ID cannot be the same",
+                    "error"=>"You don't have access to make this friend request",
                 )
                 ,400);
         }
@@ -96,33 +98,47 @@ class UserRelationshipController extends \BaseController {
 	 */
 	public function modify_relationship()
 	{
-		$validator = CustomValidator::Instance();
-        //TODO: Need to dynamically get the relationship type id. this will do for now
 
         //extracting variables
         $user_id = Input::get("user_id");
         $relationship_id = Input::get("relationship_id");
         $relationship_type = Input::get("relationship_type");
 
-        if(is_null($user_id) || strcmp($user_id,"") == 0 ||
-            !is_numeric($user_id) || !$validator->exists_in_db('user_profile', 'user_id',$user_id )){
+        $validator = Validator::make(array(
+                'user_id' => $user_id,
+                'relationship_id' => $relationship_id,
+                'relationship_type' => $relationship_type
+            ),array(
+                'user_id' => 'required|integer|exists:user_profile,user_id',
+                'relationship_id' => 'required|integer|exists:relationship,relationship_id',
+                'relationship_type' => 'required|integer|exists:relationship_type,relationship_type_id'
+            ));
+
+        if ($validator->fails()){
             return Response::json(array(
-                    "response_msg"=>"Invalid User ID",
+                    "error"=>$validator->messages()->all(),
                 )
                 ,400);
         }
 
-        if(is_null($relationship_id) || strcmp($relationship_id,"") == 0 ||
-            !is_numeric($relationship_id) || !$validator->exists_in_db('relationship', 'relationship_id',$relationship_id )){
+        $relationship_entry = Relationship::find($relationship_id);
+
+        //get owner id from OAuth
+        //TODO: Ownership not properly established
+        $ownerId = ResourceServer::getOwnerId();
+
+        if($ownerId != $relationship_entry->fk_user_2 && $ownerId != $relationship_entry->fk_user_1 ){
             return Response::json(array(
-                    "response_msg"=>"Invalid Relationship ID",
+                    "error"=>"You don't have access to modify this relationship",
                 )
                 ,400);
         }
+       //TODO: Need to dynamically get the relationship type id. this will do for now
+
 
         switch ($relationship_type) {
             case 1:
-                //pending
+                //pending. it's already pending
                 return Response::json(array(
                         "response_msg"=>"Invalid relationship type",
                     )
@@ -131,7 +147,6 @@ class UserRelationshipController extends \BaseController {
             case 2:
                 //friend
                 //set the relationship_type value to 2 (accept friend request)
-                $relationship_entry = Relationship::find($relationship_id);
                 if($relationship_entry->fk_relationship_type == 1 &&
                     $relationship_entry->fk_user_2 == $user_id){
                     $relationship_entry->fk_relationship_type = 2;
@@ -155,9 +170,8 @@ class UserRelationshipController extends \BaseController {
                 //don't know yet
                 break;
             case 4:
-                //rejected
+                //rejected = delete
                 //delete the request from relationship table
-                $relationship_entry = Relationship::find($relationship_id);
                 $relationship_entry->delete();
                 return Response::json(
                     array(
@@ -167,7 +181,6 @@ class UserRelationshipController extends \BaseController {
             case 5:
                 //deleted
                 //delete friendship from relationship table
-                $relationship_entry = Relationship::find($relationship_id);
                 $relationship_entry->delete();
                 return Response::json(
                     array(
@@ -187,17 +200,29 @@ class UserRelationshipController extends \BaseController {
 	 */
 	public function show_friend_requests($user_id)
 	{
-        $validator = CustomValidator::Instance();
-        //TODO: Need to dynamically get the relationship type id. this will do for now
+       $validator = Validator::make(array(
+                'user_id' => $user_id
+            ),array(
+                'user_id' => 'required|integer|exists:user_profile'
+            ));
 
-        //extracting variables
-        if(is_null($user_id) || strcmp($user_id,"") == 0 ||
-            !is_numeric($user_id) || !$validator->exists_in_db('user_profile', 'user_id',$user_id )){
+        if ($validator->fails()){
             return Response::json(array(
-                    "response_msg"=>"Invalid User ID",
+                    "error"=>$validator->messages()->all(),
                 )
                 ,400);
         }
+
+        //get owner id from OAuth
+        $ownerId = ResourceServer::getOwnerId();
+
+        if($ownerId != $user_id){
+            return Response::json(array(
+                    "error"=>"You don't have access to view this user's friend requests",
+                )
+                ,400);
+        }
+
 
         //TODO: Need to dynamically get the relationship type id. this will do for now
         $friend_request_array = Relationship::where('fk_user_2', '=', $user_id)
@@ -220,12 +245,25 @@ class UserRelationshipController extends \BaseController {
 	 */
 	public function show_friends($user_id)
 	{
-        $validator = CustomValidator::Instance();
+        $validator = Validator::make(array(
+                'user_id' => $user_id
+            ),array(
+                'user_id' => 'required|integer|exists:user_profile'
+            ));
 
-        if(is_null($user_id) || strcmp($user_id,"") == 0 ||
-            !is_numeric($user_id) || !$validator->exists_in_db('user_profile', 'user_id',$user_id )){
+        if ($validator->fails()){
             return Response::json(array(
-                    "response_msg"=>"Invalid User ID",
+                    "error"=>$validator->messages()->all(),
+                )
+                ,400);
+        }
+
+        //get owner id from OAuth
+        $ownerId = ResourceServer::getOwnerId();
+
+        if($ownerId != $user_id){
+            return Response::json(array(
+                    "error"=>"You don't have access to view this user's friends.",
                 )
                 ,400);
         }

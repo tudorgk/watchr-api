@@ -11,14 +11,6 @@ class ConversationManagerController extends \BaseController {
 	public function get_conversation_stream($event_id)
 	{
 
-        $validator = CustomValidator::Instance();
-        if(!$validator->is_valid_id('watchr_event', 'event_id' , $event_id)){
-            return Response::json(array(
-                    "response_msg"=>"Invalid event id",
-                )
-                ,400);
-        }
-
         //skip
         $_skip = Input::get("skip");
         if(is_null($_skip) || strcmp($_skip,"" ) == 0 ||  !is_numeric($_skip)){
@@ -30,6 +22,23 @@ class ConversationManagerController extends \BaseController {
         if(is_null($_count) || strcmp($_count,"") == 0 ||  !is_numeric($_count)){
             //if count is 0 get ALL the posts
             $_count = null;
+        }
+
+        $validator = Validator::make(array(
+                'event_id' => $event_id,
+                'skip' => $_skip,
+                'count' => $_count
+            ),array(
+                'event_id' => 'required|integer|exists:watchr_event_event_id',
+                'skip' => 'integer|required_with:count',
+                'count' => 'integer|required_with:skip'
+            ));
+
+        if ($validator->fails()){
+            return Response::json(array(
+                    "error"=>$validator->messages()->all(),
+                )
+                ,400);
         }
 
         //find the conversation we are looking for
@@ -118,39 +127,37 @@ class ConversationManagerController extends \BaseController {
 
     public function post_new_reply(){
 
-        $validator = CustomValidator::Instance();
 
         //getting the required variables from POST
-        $_user_id= Input::get("user_id");
+        //get owner id from OAuth
+        $_ownerId = ResourceServer::getOwnerId();
         $_conversation_id = Input::get("conversation_id");
         $_text = Input::get("text");
 
-        if(!$validator->is_valid_id('user_profile', 'user_id' , $_user_id)){
+        $validator = Validator::make(array(
+                'user_id' => $_ownerId,
+                'conversation_id' => $_conversation_id,
+                'text' =>$_text
+            ),array(
+                'user_id' => 'required|integer|exists:user_profile,user_id',
+                'conversation_id' => 'required|integer|exists:conversation,conversation_id',
+                'text' => 'required|max:500'
+            ));
+
+        if ($validator->fails()){
             return Response::json(array(
-                    "response_msg"=>"Invalid user id",
+                    "error"=>$validator->messages()->all(),
                 )
                 ,400);
         }
 
-        if(!$validator->is_valid_id('conversation', 'conversation_id' , $_conversation_id)){
-            return Response::json(array(
-                    "response_msg"=>"Invalid conversation id",
-                )
-                ,400);
-        }
 
-        if(!$validator->is_valid_string($_text,500)){
-            return Response::json(array(
-                    "response_msg"=>"Text empty or out of scope",
-                )
-                ,400);
-        }
 
         //after sanity check, create a new entry in the conversation_reply table
         $reply = new Conversation_reply();
         $reply->reply_text = $_text;
         $reply->fk_conversation = $_conversation_id;
-        $reply->fk_user = $_user_id;
+        $reply->fk_user = $_ownerId;
         $reply->fk_reply_status = 1; //it's ok
         $reply->save();
 
@@ -170,31 +177,34 @@ class ConversationManagerController extends \BaseController {
      */
 
     public function delete_reply(){
-        $validator = CustomValidator::Instance();
+
 
         //getting the required variables from POST
-        $_user_id= Input::get("user_id");
+        //get owner id from OAuth
+        $_ownerId = ResourceServer::getOwnerId();
         $_reply_id = Input::get("reply_id");
 
-        if(!$validator->is_valid_id('user_profile', 'user_id' , $_user_id)){
+        $validator = Validator::make(array(
+                'user_id' => $_ownerId,
+                'reply_id' => $_reply_id
+            ),array(
+                'user_id' => 'required|integer|exists:user_profile,user_id',
+                'reply_id' => 'required|integer|exists:conversation_reply,reply_id'
+            ));
+
+        if ($validator->fails()){
             return Response::json(array(
-                    "response_msg"=>"Invalid user id",
+                    "error"=>$validator->messages()->all(),
                 )
                 ,400);
         }
 
-        if(!$validator->is_valid_id('conversation_reply', 'reply_id' , $_reply_id)){
-            return Response::json(array(
-                    "response_msg"=>"Invalid reply id",
-                )
-                ,400);
-        }
 
         $reply_to_delete = Conversation_reply::find($_reply_id);
 
-        if($reply_to_delete->fk_user != $_user_id){
+        if($reply_to_delete->fk_user != $_ownerId){
             return Response::json(array(
-                    "response_msg"=>"Invalid creator id",
+                    "response_msg"=>"You don't have permission to delete this reply",
                 )
                 ,400);
         }

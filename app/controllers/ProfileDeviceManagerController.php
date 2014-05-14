@@ -269,7 +269,7 @@ class ProfileDeviceManagerController extends \BaseController {
         $validator = Validator::make(array(
                 'device_id' => $device_id
             ),array(
-                'device_id' => 'required|integer|exists:device'
+                'device_id' => 'required|integer|exists:device|exists:profile_device,fk_device'
             ));
 
         if ($validator->fails()){

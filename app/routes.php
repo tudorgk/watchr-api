@@ -141,161 +141,161 @@ Route::group(array('before' => 'oauth'), function()
 
 
 //Country routes
-Route::get("country/all", [
-        "as"   => "countries/index",
-        "uses" => "CountryController@index"
-    ]);
-Route::get("country/{country_id}", [
-        "as"   => "country/show",
-        "uses" => "CountryController@show"
-    ]);
+        Route::get("country/all", [
+                "as"   => "countries/index",
+                "uses" => "CountryController@index"
+            ]);
+        Route::get("country/{country_id}", [
+                "as"   => "country/show",
+                "uses" => "CountryController@show"
+            ]);
 
 
 //profile_statuses routes
 
-Route::get("profile_status/all", [
-        "as"   => "profileStatuses/index",
-        "uses" => "ProfileStatusController@index"
-    ]);
+        Route::get("profile_status/all", [
+                "as"   => "profileStatuses/index",
+                "uses" => "ProfileStatusController@index"
+            ]);
 
-/*
- * device Profile routes
- */
+        /*
+         * device Profile routes
+         */
 
 
 //get all the devices for the user
-Route::get("device/user/{user_id}", [
-        "as"   => "devicesForUser/show",
-        "uses" => "ProfileDeviceManagerController@show_users_devices"
-    ]);
+        Route::get("device/user/{user_id}", [
+                "as"   => "devicesForUser/show",
+                "uses" => "ProfileDeviceManagerController@show_users_devices"
+            ]);
 
 //show a device for a particular user
-Route::get("device/{device_id}", [
-        "as"   => "device/show",
-        "uses" => "ProfileDeviceManagerController@show"
-    ]);
+        Route::get("device/{device_id}", [
+                "as"   => "device/show",
+                "uses" => "ProfileDeviceManagerController@show"
+            ]);
 
 //add another device and bind it with the user
-Route::post("device", [
-        "as"   => "device/store",
-        "uses" => "ProfileDeviceManagerController@store"
-    ]);
+        Route::post("device", [
+                "as"   => "device/store",
+                "uses" => "ProfileDeviceManagerController@store"
+            ]);
 
 
 //update device credentials
-Route::post("device/update/{device_id}", [
-        "as"   => "device/update",
-        "uses" => "ProfileDeviceManagerController@update"
-    ]);
+        Route::post("device/update/{device_id}", [
+                "as"   => "device/update",
+                "uses" => "ProfileDeviceManagerController@update"
+            ]);
 
 //remove a device
-Route::post("device/delete", [
-        "as"   => "device/destroy",
-        "uses" => "ProfileDeviceManagerController@destroy"
-    ]);
+        Route::post("device/delete", [
+                "as"   => "device/destroy",
+                "uses" => "ProfileDeviceManagerController@destroy"
+            ]);
 
-
-
-/*
- * User Relationships routes
- */
+        /*
+         * User Relationships routes
+         */
 
 
 //get Relationship Types
-Route::get("relationship/types", [
-        "as"   => "relationshipTypes/show",
-        "uses" => "UserRelationshipController@show_all_relationship_types"
-    ]);
+        Route::get("relationship/types", [
+                "as"   => "relationshipTypes/show",
+                "uses" => "UserRelationshipController@show_all_relationship_types"
+            ]);
 
 
 //get pending Friend Requests List
-Route::get("relationship/requests/{user_id}", [
-        "as"   => "relationshipFriendRequests/show",
-        "uses" => "UserRelationshipController@show_friend_requests"
-    ]);
+        Route::get("relationship/requests/{user_id}", [
+                "as"   => "relationshipFriendRequests/show",
+                "uses" => "UserRelationshipController@show_friend_requests"
+            ]);
 
 //get Friend List
-Route::get("relationship/friends/{user_id}", [
-        "as"   => "relationshipFriends/show",
-        "uses" => "UserRelationshipController@show_friends"
-    ]);
+        Route::get("relationship/friends/{user_id}", [
+                "as"   => "relationshipFriends/show",
+                "uses" => "UserRelationshipController@show_friends"
+            ]);
 
 //get Blocked List
-Route::get("relationship/blocked/{user_id}", [
-        "as"   => "relationshipBlockedUsers/show",
-        "uses" => "UserRelationshipController@show_blocked_users"
-    ]);
+        //Not implemented yet
+        Route::get("relationship/blocked/{user_id}", [
+                "as"   => "relationshipBlockedUsers/show",
+                "uses" => "UserRelationshipController@show_blocked_users"
+            ]);
 
 //send Friend Request to user
-Route::post("relationship/request", [
-        "as"   => "friendRequest/store",
-        "uses" => "UserRelationshipController@send_friend_request"
-    ]);
+        Route::post("relationship/request", [
+                "as"   => "friendRequest/store",
+                "uses" => "UserRelationshipController@send_friend_request"
+            ]);
 
 //modify Relationship Type (accept/block/ignore Request)
-Route::post("relationship/modify", [
-        "as"   => "modifyRelationship/modify",
-        "uses" => "UserRelationshipController@modify_relationship"
-    ]);
+        //TODO: needs tinkering a little bit
+        Route::post("relationship/modify", [
+                "as"   => "modifyRelationship/modify",
+                "uses" => "UserRelationshipController@modify_relationship"
+            ]);
 
-/*
- * Watchr Events routes
- */
+        /*
+         * Watchr Events routes
+         */
 //get Event details
 
 
-Route::get("events/active", [
-        "as"   => "events/show",
-        "uses" => "EventManagerController@get_active_events"
-    ]);
+        Route::get("events/active", [
+                "as"   => "events/show",
+                "uses" => "EventManagerController@get_active_events"
+            ]);
 
 //get a specific event
-Route::get("events/{event_id}", [
-        "as"   => "events/show",
-        "uses" => "EventManagerController@get_event_details"
-    ]);
+        Route::get("events/{event_id}", [
+                "as"   => "events/show",
+                "uses" => "EventManagerController@get_event_details"
+            ]);
 
 //post a new event
-Route::post("events/new", [
-        "as"   => "events/new",
-        "uses" => "EventManagerController@post_new_event"
-    ]);
+        Route::post("events/new", [
+                "as"   => "events/new",
+                "uses" => "EventManagerController@post_new_event"
+            ]);
 
 //post a new event
-Route::post("events/new_with_media", [
-        "as"   => "events/new_with_media",
-        "uses" => "EventManagerController@post_new_event_with_media"
-    ]);
+        Route::post("events/new_with_media", [
+                "as"   => "events/new_with_media",
+                "uses" => "EventManagerController@post_new_event_with_media"
+            ]);
 
 //destroy an event
-Route::post("events/destroy/{event_id}", [
-        "as"   => "events/destroy",
-        "uses" => "EventManagerController@delete_event"
-    ]);
+        Route::post("events/destroy/{event_id}", [
+                "as"   => "events/destroy",
+                "uses" => "EventManagerController@delete_event"
+            ]);
 
-/*
- * Watchr Conversation methods
- */
+        /*
+         * Watchr Conversation methods
+         */
 
 
 //Get a conversation stream for an event. It's automatically created on event creation.
 //With optional take() and skip(). Returns all the necessary data for every reply in the stream
-Route::get("events/conversation/{event_id}", [
-        "as"   => "events/conversation/stream",
-        "uses" => "ConversationManagerController@get_conversation_stream"
-    ]);
+        Route::get("events/conversation/{event_id}", [
+                "as"   => "events/conversation/stream",
+                "uses" => "ConversationManagerController@get_conversation_stream"
+            ]);
 
 //Post a new reply to a conversation
-Route::post("events/conversation/reply/new", [
-        "as"   => "events/conversation/reply/new",
-        "uses" => "ConversationManagerController@post_new_reply"
-    ]);
+        Route::post("events/conversation/reply/new", [
+                "as"   => "events/conversation/reply/new",
+                "uses" => "ConversationManagerController@post_new_reply"
+            ]);
 
 //Delete a user's reply
-Route::post("events/conversation/reply/destroy", [
-        "as"   => "events/conversation/reply/destroy",
-        "uses" => "ConversationManagerController@delete_reply"
-    ]);
+        Route::post("events/conversation/reply/destroy", [
+                "as"   => "events/conversation/reply/destroy",
+                "uses" => "ConversationManagerController@delete_reply"
+            ]);
 
     });
 

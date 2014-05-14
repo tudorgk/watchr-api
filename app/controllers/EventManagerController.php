@@ -10,12 +10,16 @@ class EventManagerController extends \BaseController {
 	 */
 	public function get_event_details($event_id)
 	{
-        $validator = CustomValidator::Instance();
 
-        if(is_null($event_id) || strcmp($event_id,"") == 0 ||
-            !is_numeric($event_id) || !$validator->exists_in_db('watchr_event', 'event_id',$event_id )){
+        $validator = Validator::make(array(
+                'event_id' => $event_id
+            ),array(
+                'event_id' => 'required|integer|exists:watchr_event,event_id'
+            ));
+
+        if ($validator->fails()){
             return Response::json(array(
-                    "response_msg"=>"Invalid Event ID",
+                    "error"=>$validator->messages()->all(),
                 )
                 ,400);
         }
@@ -54,8 +58,6 @@ class EventManagerController extends \BaseController {
      */
     public function post_new_event($hasMedia = 0){
 
-        $validator = CustomValidator::Instance();
-
         //getting the required variables from POST
         $_event_name= Input::get("event_name");
         $_event_description = Input::get("event_description");
@@ -68,35 +70,33 @@ class EventManagerController extends \BaseController {
             $_event_category_array = json_decode(Input::get("categories"));
         }
 
-        //TODO: Need to get the user id automatically using OAuth. Basic POST parameter will do for now
-        $_creator_id = Input::get("creator_id");
+        //getting creator ID using OAuth
+         $_creator_id = ResourceServer::getOwnerId();
 
         //NOT Optional: position
         $_latitude = Input::get("latitude");
         $_longitude = Input::get("longitude");
 
-        if(is_null($_event_name) || strcmp($_event_name,"") == 0 ||
-            strlen($_event_name) > 100 ){
-            return Response::json(array(
-                    "response_msg"=>"Invalid event name",
-                )
-                ,400);
-        }
 
-        if(is_null($_creator_id) || strcmp($_creator_id,"") == 0 ||
-            !is_numeric($_creator_id) || !$validator->exists_in_db('user_profile', 'user_id',$_creator_id)){
-            return Response::json(array(
-                    "response_msg"=>"Invalid creator_id",
-                )
-                ,400);
-        }
+        $validator = Validator::make(array(
+                'event_name' => $_event_name,
+                'event_description' => $_event_description,
+                'categories' => $_event_category_array,
+                'creator_id' => $_creator_id,
+                'latitude' => $_latitude,
+                'longitude' => $_longitude
+            ),array(
+                'event_name' => 'required|max:100',
+                'event_description' => 'max:400',
+                'categories' => 'required|array',
+                'creator_id' => 'required|integer|exists:user_profile,user_id',
+                'latitude' => 'required|numeric',
+                'longitude' => 'required|numeric'
+            ));
 
-
-        //TODO: Must make position optional
-        if(is_null($_latitude) || strcmp($_latitude,"") == 0 ||
-            is_null($_longitude) || strcmp($_longitude,"") == 0 ){
+        if ($validator->fails()){
             return Response::json(array(
-                    "response_msg"=>"Invalid position",
+                    "error"=>$validator->messages()->all(),
                 )
                 ,400);
         }
@@ -123,8 +123,13 @@ class EventManagerController extends \BaseController {
         //set-up event_category table
         foreach ($_event_category_array as $category){
 
-            //it the category id isn't valid place it in 5 Not Known
-            if(!$validator->exists_in_db('watchr_category', 'category_id',$category)){
+            $category_validator = Validator::make(array(
+                    'category_id' => $category
+                ),array(
+                    'category_id' => 'required|integer|exists:watchr_category,category_id'
+                ));
+
+            if($category_validator->fails()){
                 $category = 5;
             }
 
@@ -142,6 +147,7 @@ class EventManagerController extends \BaseController {
     }
 
     public function post_new_event_with_media(){
+        //post default event with hasMedia set to 1
         $response = $this->post_new_event(1);
 
         //if the sanity checks fail
@@ -197,16 +203,35 @@ class EventManagerController extends \BaseController {
 
     public function delete_event($event_id){
 
-        $validator = CustomValidator::Instance();
-        if(!$validator->is_valid_id('watchr_event', 'event_id' , $event_id)){
+        //getting creator ID using OAuth
+        $_creator_id = ResourceServer::getOwnerId();
+
+        $validator = Validator::make(array(
+                'event_id' => $event_id,
+                'creator_id' => $_creator_id,
+            ),array(
+                'event_id' => 'required|integer|exists:watchr_event,event_id',
+                'creator_id' => 'required|integer|exists:user_profile,user_id'
+            ));
+
+        if ($validator->fails()){
             return Response::json(array(
-                    "response_msg"=>"Invalid event id",
+                    "error"=>$validator->messages()->all(),
                 )
                 ,400);
         }
 
+
+
         //doesn't actually delete it.. just sets the event_status to 2->delete
         $event_record_2_delete = Watchr_event::find($event_id);
+
+        if($_creator_id !=  $event_record_2_delete->fk_created_by_user){
+            return Response::json(array(
+                    "error"=>"You don't have access to delete this user's event",
+                )
+                ,400);
+        }
 
         //TODO: get event_status dynamically
         $event_record_2_delete->fk_event_status = 2;
@@ -242,6 +267,23 @@ class EventManagerController extends \BaseController {
             $_count = null;
         }
 
+
+        $validator = Validator::make(array(
+                'since_id' => $_since_id,
+                'skip' => $_skip,
+                'count' => $_count
+            ),array(
+                'since_id' => 'integer',
+                'skip' => 'integer|required_with:count',
+                'count' => 'integer|required_with:skip'
+            ));
+
+        if ($validator->fails()){
+            return Response::json(array(
+                    "error"=>$validator->messages()->all(),
+                )
+                ,400);
+        }
 
         //geocode = json array with (latitude, longitude, radius)
         $_geocode = Input::get('geocode');

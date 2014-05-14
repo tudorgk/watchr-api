@@ -47,7 +47,7 @@ class User_profile extends \Eloquent implements UserInterface, RemindableInterfa
 
     protected $primaryKey = "user_id";
 
-    protected $hidden = ["password", "fk_photo", "fk_profile_status"];
+    protected $hidden = ["password", "fk_profile_status"];
 
     protected $guarded = [
         "user_id",
