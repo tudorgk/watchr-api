@@ -31,6 +31,7 @@
  * @method static \Illuminate\Database\Query\Builder|\User_profile whereUpdatedAt($value)
  * @property-read \Attachment $photo
  * @property string $remember_token
+ * @property-read \Country $country
  */
 use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\Reminders\RemindableInterface;

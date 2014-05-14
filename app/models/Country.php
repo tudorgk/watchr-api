@@ -21,6 +21,7 @@
  * @method static \Illuminate\Database\Query\Builder|\Country whereUnMember($value)
  * @method static \Illuminate\Database\Query\Builder|\Country whereCallingCode($value)
  * @method static \Illuminate\Database\Query\Builder|\Country whereCctld($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|\User_profile[] $users
  */
 class Country extends \Eloquent {
 	protected $fillable = [];
