@@ -42,6 +42,13 @@ class EventManagerController extends \BaseController {
 
         $response_array['creator'] = $creator_query->toArray();
 
+        //check if the event has media
+        if($event_query->hasMedia){
+
+            $media = $event_query->attachments()->get()->toArray();
+            $response_array['media'] = $media;
+        }
+
         return Response::json(array(
                 "response_msg"=>"Request Ok",
                 "data" => $response_array
@@ -177,22 +184,30 @@ class EventManagerController extends \BaseController {
         //TODO: Verify Mime Types
         foreach($allFiles as $file){
 
-            //create an attachment record
-            $new_attachment_record = new Attachment();
-            $new_attachment_record->location = $destinationPath;
-            $new_attachment_record->attachment_type = $file->getMimeType();
-            $new_attachment_record->filename= $file->getClientOriginalName();
-            $new_attachment_record->size = $file->getSize();
-            $new_attachment_record->save();
+            $validator = Validator::make(array(
+                    'photo' => $file
+                ),array(
+                    'photo' => 'mimes:jpeg,png'
+                ));
 
-            //move the file to the specified location
-            $file->move($destinationPath,$file->getClientOriginalName());
+            if(!$validator->fails()){
+                //create an attachment record
+                $new_attachment_record = new Attachment();
+                $new_attachment_record->location = $destinationPath;
+                $new_attachment_record->attachment_type = $file->getMimeType();
+                $new_attachment_record->filename= $file->getClientOriginalName();
+                $new_attachment_record->size = $file->getSize();
+                $new_attachment_record->save();
 
-            //bind the attachment with the event
-            $new_ev_attach_record = new Event_attachment();
-            $new_ev_attach_record->fk_event = $response_data->data->event_id;
-            $new_ev_attach_record->fk_attachment = $new_attachment_record->id;
-            $new_ev_attach_record->save();
+                //move the file to the specified location
+                $file->move($destinationPath,$file->getClientOriginalName());
+
+                //bind the attachment with the event
+                $new_ev_attach_record = new Event_attachment();
+                $new_ev_attach_record->fk_event = $response_data->data->event_id;
+                $new_ev_attach_record->fk_attachment = $new_attachment_record->id;
+                $new_ev_attach_record->save();
+            }
         }
 
         return Response::json(array(
