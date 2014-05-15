@@ -249,12 +249,6 @@ Route::group(array('before' => 'oauth'), function()
                 "uses" => "EventManagerController@get_active_events"
             ]);
 
-//get a specific event
-        Route::get("events/{event_id}", [
-                "as"   => "events/show",
-                "uses" => "EventManagerController@get_event_details"
-            ]);
-
 //post a new event
         Route::post("events/new", [
                 "as"   => "events/new",
@@ -297,7 +291,33 @@ Route::group(array('before' => 'oauth'), function()
                 "uses" => "ConversationManagerController@delete_reply"
             ]);
 
+        /*
+         * Event rating methods
+         *
+         */
+
+
+        //get rating for an event
+        Route::get("events/rating", [
+                "as"   => "events/rating/get",
+                "uses" => "EventRatingController@get_rating_for_event"
+            ]);
+
+        //post a rating
+        Route::post("events/rating", [
+                "as"   => "events/rating/post",
+                "uses" => "EventRatingController@post_rating"
+            ]);
+
+        //get a specific event
+        Route::get("events/details/{event_id}", [
+                "as"   => "events/show",
+                "uses" => "EventManagerController@get_event_details"
+            ]);
+
     });
+
+
 
 Route::model("user", "User_profile");
 
