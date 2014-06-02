@@ -282,16 +282,37 @@ class EventManagerController extends \BaseController {
             $_count = null;
         }
 
+        //order by
+        $_order_by = Input::get("order_by");
+        if(is_null($_order_by) || strcmp($_order_by,"") == 0){
+            //if order_by is null, order by creation date
+            $_order_by = 'created_at';
+        }
+
+        //order mode
+        $_order_mode = Input::get("order_mode");
+        if(is_null($_order_mode) || strcmp($_order_mode,"") == 0){
+            //if order mode (ASC or DESC)
+            $_order_mode = 'DESC';
+        }
+
+
 
         $validator = Validator::make(array(
                 'since_id' => $_since_id,
                 'skip' => $_skip,
-                'count' => $_count
+                'count' => $_count,
+                'order_by' => $_order_by,
+                'order_mode' => $_order_mode
             ),array(
                 'since_id' => 'integer',
                 'skip' => 'integer|required_with:count',
-                'count' => 'integer|required_with:skip'
+                'count' => 'integer|required_with:skip',
+                'order_by' => 'in:created_at,updated_at,rating,distance',
+                'order_mode' => 'in:ASC,DESC'
             ));
+
+        //TODO: Encapsulate rating and distance in query
 
         if ($validator->fails()){
             return Response::json(array(
@@ -307,11 +328,50 @@ class EventManagerController extends \BaseController {
         }else{
             $_geocode_data = explode(",", $_geocode);
             //TODO: sanity checks for values
+            if(count($_geocode_data)!=3){
+                return Response::json(array(
+                        "error"=>"Geocode data missing latitude/longitude/radius",
+                    )
+                    ,400);
+            }
+
+            $geocodeValidator = Validator::make(array(
+                    'latitude' => $_geocode_data[0],
+                    'longitude' => $_geocode_data[1],
+                    'radius' => $_geocode_data[2]
+                ),array(
+                    'latitude' => 'numeric',
+                    'longitude' => 'numeric',
+                    'radius' => 'numeric'
+                ));
+
+            if ($geocodeValidator->fails()){
+                return Response::json(array(
+                        "error"=>$geocodeValidator->messages()->all(),
+                    )
+                    ,400);
+            }
         }
 
 //        var_dump($_geocode_data);
-
+        //TODO: Need to redo this query. Not sexy enough
         if($_geocode_data){
+            $query_string =  'SELECT *,distance FROM watchr_event E
+                            WHERE '. $_geocode_data[2] .'>
+                            (SELECT (111.045* DEGREES(ACOS(COS(RADIANS('. $_geocode_data[0] .'))
+                                            * COS(RADIANS(latitude))
+                                            * COS(RADIANS('. $_geocode_data[1] .') - RADIANS(longitude))
+                                            + SIN(RADIANS('. $_geocode_data[0] .'))
+                                            * SIN(RADIANS(latitude))))) AS distance
+                                FROM position
+                                WHERE latitude
+                                    BETWEEN '. $_geocode_data[0] .'  - ('. $_geocode_data[2] .' / 111.045)
+                                        AND '. $_geocode_data[0] .'  + ('. $_geocode_data[2] .' / 111.045)
+                                AND longitude
+                                    BETWEEN '. $_geocode_data[1] .' - ('. $_geocode_data[2] .' / (111.045 * COS(RADIANS('. $_geocode_data[0] .'))))
+                                    AND '. $_geocode_data[1] .' + ('. $_geocode_data[2] .' / (111.045 * COS(RADIANS('. $_geocode_data[0] .'))))
+                                AND position_id = E.fk_location)';
+
 
             if ($_count != null && $_skip!=null){
                 //don't know any other way... Got to find an Eloquent query

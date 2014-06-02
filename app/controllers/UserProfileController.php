@@ -75,7 +75,7 @@ class UserProfileController extends \BaseController {
         $user->save();
 
         return Response::json(array(
-                "response_msg"=>"Request Ok",
+                "response_msg"=>"User Created",
             )
             ,201);
 	}
