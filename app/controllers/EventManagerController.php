@@ -356,61 +356,34 @@ class EventManagerController extends \BaseController {
 //        var_dump($_geocode_data);
         //TODO: Need to redo this query. Not sexy enough
         if($_geocode_data){
-            $query_string =  'SELECT *,distance FROM watchr_event E
-                            WHERE '. $_geocode_data[2] .'>
-                            (SELECT (111.045* DEGREES(ACOS(COS(RADIANS('. $_geocode_data[0] .'))
-                                            * COS(RADIANS(latitude))
-                                            * COS(RADIANS('. $_geocode_data[1] .') - RADIANS(longitude))
-                                            + SIN(RADIANS('. $_geocode_data[0] .'))
-                                            * SIN(RADIANS(latitude))))) AS distance
-                                FROM position
-                                WHERE latitude
-                                    BETWEEN '. $_geocode_data[0] .'  - ('. $_geocode_data[2] .' / 111.045)
-                                        AND '. $_geocode_data[0] .'  + ('. $_geocode_data[2] .' / 111.045)
-                                AND longitude
-                                    BETWEEN '. $_geocode_data[1] .' - ('. $_geocode_data[2] .' / (111.045 * COS(RADIANS('. $_geocode_data[0] .'))))
-                                    AND '. $_geocode_data[1] .' + ('. $_geocode_data[2] .' / (111.045 * COS(RADIANS('. $_geocode_data[0] .'))))
-                                AND position_id = E.fk_location)';
-
+            $query_string =  'SELECT *,latitude, longitude, distance
+                          FROM watchr_event E,(
+                        SELECT latitude, longitude,position_id,r,
+                               111.045* DEGREES(ACOS(COS(RADIANS(latpoint))
+                                         * COS(RADIANS(latitude))
+                                         * COS(RADIANS(longpoint) - RADIANS(longitude))
+                                         + SIN(RADIANS(latpoint))
+                                         * SIN(RADIANS(latitude)))) AS distance
+                         FROM position
+                         JOIN (
+                                SELECT  '.$_geocode_data[0].'  AS latpoint,  '.$_geocode_data[1].' AS longpoint, '.$_geocode_data[2].' AS r
+                           ) AS p
+                         WHERE latitude
+                           BETWEEN latpoint  - (r / 111.045)
+                               AND latpoint  + (r / 111.045)
+                           AND longitude
+                           BETWEEN longpoint - (r / (111.045 * COS(RADIANS(latpoint))))
+                               AND longpoint + (r / (111.045 * COS(RADIANS(latpoint))))
+                          ) d
+                         WHERE distance <= r
+                         AND position_id = E.fk_location
+                         ORDER BY '.$_order_by.' '.$_order_mode.'';
 
             if ($_count != null && $_skip!=null){
                 //don't know any other way... Got to find an Eloquent query
-                $query_results = DB::select(DB::raw(
-                        'SELECT * FROM watchr_event E
-                            WHERE '. $_geocode_data[2] .'>
-                            (SELECT (111.045* DEGREES(ACOS(COS(RADIANS('. $_geocode_data[0] .'))
-                                            * COS(RADIANS(latitude))
-                                            * COS(RADIANS('. $_geocode_data[1] .') - RADIANS(longitude))
-                                            + SIN(RADIANS('. $_geocode_data[0] .'))
-                                            * SIN(RADIANS(latitude))))) AS distance
-                                FROM position
-                                WHERE latitude
-                                    BETWEEN '. $_geocode_data[0] .'  - ('. $_geocode_data[2] .' / 111.045)
-                                        AND '. $_geocode_data[0] .'  + ('. $_geocode_data[2] .' / 111.045)
-                                AND longitude
-                                    BETWEEN '. $_geocode_data[1] .' - ('. $_geocode_data[2] .' / (111.045 * COS(RADIANS('. $_geocode_data[0] .'))))
-                                    AND '. $_geocode_data[1] .' + ('. $_geocode_data[2] .' / (111.045 * COS(RADIANS('. $_geocode_data[0] .'))))
-                                AND position_id = E.fk_location)
-                            ORDER BY created_at DESC
-                            LIMIT '. $_count .' OFFSET '. $_skip .' '));
+                $query_results = DB::select(DB::raw($query_string.' LIMIT '. $_count .' OFFSET '. $_skip .' '));
             }else{
-                $query_results = DB::select(DB::raw(
-                        'SELECT * FROM watchr_event E
-                            WHERE '. $_geocode_data[2] .'>
-                            (SELECT (111.045* DEGREES(ACOS(COS(RADIANS('. $_geocode_data[0] .'))
-                                            * COS(RADIANS(latitude))
-                                            * COS(RADIANS('. $_geocode_data[1] .') - RADIANS(longitude))
-                                            + SIN(RADIANS('. $_geocode_data[0] .'))
-                                            * SIN(RADIANS(latitude))))) AS distance
-                                FROM position
-                                WHERE latitude
-                                    BETWEEN '. $_geocode_data[0] .'  - ('. $_geocode_data[2] .' / 111.045)
-                                        AND '. $_geocode_data[0] .'  + ('. $_geocode_data[2] .' / 111.045)
-                                AND longitude
-                                    BETWEEN '. $_geocode_data[1] .' - ('. $_geocode_data[2] .' / (111.045 * COS(RADIANS('. $_geocode_data[0] .'))))
-                                    AND '. $_geocode_data[1] .' + ('. $_geocode_data[2] .' / (111.045 * COS(RADIANS('. $_geocode_data[0] .'))))
-                                AND position_id = E.fk_location)
-                            ORDER BY created_at DESC'));
+                $query_results = DB::select(DB::raw($query_string));
             }
 
 
