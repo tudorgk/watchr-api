@@ -330,7 +330,7 @@ class EventManagerController extends \BaseController {
                 'since_id' => 'integer',
                 'skip' => 'integer|required_with:count',
                 'count' => 'integer|required_with:skip',
-                'order_by' => 'in:created_at,updated_at,sum_rating,distance',
+                'order_by' => 'in:created_at,updated_at,event_rating,distance',
                 'order_mode' => 'in:ASC,DESC'
             ));
 
@@ -376,18 +376,18 @@ class EventManagerController extends \BaseController {
         }
 
         if($_geocode_data){
-            $query_string =  'SELECT *,latitude, longitude, distance_in_km,(
+            $query_string =  'SELECT *,latitude, longitude, distance,(
                            SELECT SUM(r.rating_value)
                             FROM rating r
                             WHERE r.fk_event_id = E.event_id
-                            ) AS sum_rating
+                            ) AS event_rating
                           FROM watchr_event E, (
                         SELECT latitude, longitude,position_id,r,
                                111.045* DEGREES(ACOS(COS(RADIANS(latpoint))
                                          * COS(RADIANS(latitude))
                                          * COS(RADIANS(longpoint) - RADIANS(longitude))
                                          + SIN(RADIANS(latpoint))
-                                         * SIN(RADIANS(latitude)))) AS distance_in_km
+                                         * SIN(RADIANS(latitude)))) AS distance
                          FROM position
                          JOIN (
                                 SELECT  '.$_geocode_data[0].'  AS latpoint,  '.$_geocode_data[1].' AS longpoint, '.$_geocode_data[2].' AS r
@@ -399,7 +399,7 @@ class EventManagerController extends \BaseController {
                            BETWEEN longpoint - (r / (111.045 * COS(RADIANS(latpoint))))
                                AND longpoint + (r / (111.045 * COS(RADIANS(latpoint))))
                           ) d
-                         WHERE distance_in_km <= r
+                         WHERE distance <= r
                          AND position_id = E.fk_location
                          ORDER BY '.$_order_by.' '.$_order_mode.'';
 
@@ -431,7 +431,7 @@ class EventManagerController extends \BaseController {
                            SELECT SUM(r.rating_value)
                             FROM rating r
                             WHERE r.fk_event_id = watchr_event.event_id
-                            ) AS sum_rating')
+                            ) AS event_rating')
                     )
                 )->where('fk_event_status','=', '1')->orderBy($_order_by,$_order_mode)->skip($_skip)->take($_count)->get();
             }else{
@@ -442,7 +442,7 @@ class EventManagerController extends \BaseController {
                            SELECT SUM(r.rating_value)
                             FROM rating r
                             WHERE r.fk_event_id = watchr_event.event_id
-                            ) AS sum_rating')
+                            ) AS event_rating')
                     )
                 )->where('fk_event_status','=', '1')->orderBy($_order_by,$_order_mode)->get();
             }
@@ -475,11 +475,11 @@ class EventManagerController extends \BaseController {
         //add the distance as well to the event
         if($_geocode_data){
             for($i =0 ; $i<count($events_array); $i++){
-                $response_array[$i]['distance'] = $query_results[$i]->distance_in_km;
-                $response_array[$i]['rating'] = $query_results[$i]->sum_rating;
+                $response_array[$i]['distance'] = $query_results[$i]->distance;
+                $response_array[$i]['rating'] = $query_results[$i]->event_rating;
             }
         }else{
-            //no geocode data. add just the rating
+            //no geocode data.
         }
 
         return Response::json(array(
