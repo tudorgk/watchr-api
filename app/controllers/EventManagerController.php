@@ -386,7 +386,7 @@ class EventManagerController extends \BaseController {
                 $query_results = DB::select(DB::raw($query_string));
             }
 
-            var_dump($query_results);
+            //var_dump($query_results);
 
             $events_array = array();
 
