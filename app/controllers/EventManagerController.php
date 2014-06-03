@@ -229,6 +229,7 @@ class EventManagerController extends \BaseController {
             }
         }
 
+
         return Response::json(array(
                 'response_msg' =>'Event with media uploaded successfully'
             ), 201);
@@ -374,11 +375,13 @@ class EventManagerController extends \BaseController {
             }
         }
 
-//        var_dump($_geocode_data);
-        //TODO: Need to redo this query. Not sexy enough
         if($_geocode_data){
-            $query_string =  'SELECT *,latitude, longitude, distance_in_km
-                          FROM watchr_event E,(
+            $query_string =  'SELECT *,latitude, longitude, distance_in_km,(
+                           SELECT SUM(r.rating_value)
+                            FROM rating r
+                            WHERE r.fk_event_id = E.event_id
+                            ) AS sum_rating
+                          FROM watchr_event E, (
                         SELECT latitude, longitude,position_id,r,
                                111.045* DEGREES(ACOS(COS(RADIANS(latpoint))
                                          * COS(RADIANS(latitude))
@@ -407,12 +410,9 @@ class EventManagerController extends \BaseController {
                 $query_results = DB::select(DB::raw($query_string));
             }
 
-            //var_dump($query_results);
+//            var_dump($query_results);
 
             $events_array = array();
-
-
-
 
             foreach($query_results as $event){
                 //iterate the basic query results -> need to turn them in to Watchr_event models
@@ -438,6 +438,7 @@ class EventManagerController extends \BaseController {
         //get the attachments
         foreach($events_array as $event){
             $event = Watchr_event::find($event['event_id']);
+
             if($event['hasMedia']){
                 $attachments_query = $event->attachments()->get();
                 $event['attachments'] = $attachments_query->toArray();
@@ -451,14 +452,19 @@ class EventManagerController extends \BaseController {
             $location = Position::find($event->fk_location);
             $event['position'] = $location->toArray();
 
-            $response_array[] =$event->toArray();
+            $event_to_add = $event->toArray();
+            $event_to_add['rating'] = $event->getRating();
+            $response_array[] =$event_to_add;
         }
 
         //add the distance as well to the event
         if($_geocode_data){
             for($i =0 ; $i<count($events_array); $i++){
                 $response_array[$i]['distance'] = $query_results[$i]->distance_in_km;
+                $response_array[$i]['rating'] = $query_results[$i]->sum_rating;
             }
+        }else{
+            //no geocode data. add just the rating
         }
 
         return Response::json(array(
