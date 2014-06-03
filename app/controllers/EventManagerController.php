@@ -167,6 +167,19 @@ class EventManagerController extends \BaseController {
         //get all the files from the input
         $allFiles = Input::file('media');
 
+        $validator = Validator::make(array(
+                'media' => $allFiles
+            ),array(
+                'media' => 'array|required'
+            ));
+
+        if($validator->fails()){
+            $this->delete_event($response_data->data->event_id);
+            return Response::json(array(
+                    'response_msg' =>'Error uploading file. Check file array'
+                ), 400);
+        }
+
         if(empty($allFiles)){
             $this->delete_event($response_data->data->event_id);
             return Response::json(array(
@@ -184,16 +197,16 @@ class EventManagerController extends \BaseController {
         //TODO: Verify Mime Types
         foreach($allFiles as $file){
 
-            $validator = Validator::make(array(
+            $mediavalidator = Validator::make(array(
                     'photo' => $file
                 ),array(
                     'photo' => 'mimes:jpeg,png'
                 ));
 
-            if(!$validator->fails()){
+            if(!$mediavalidator->fails()){
                 //create an attachment record
                 $new_attachment_record = new Attachment();
-                $new_attachment_record->location = $destinationPath;
+                $new_attachment_record->location = asset('uploads/'.$response_data->data->event_id . '/'.$file->getClientOriginalName());;
                 $new_attachment_record->attachment_type = $file->getMimeType();
                 $new_attachment_record->filename= $file->getClientOriginalName();
                 $new_attachment_record->size = $file->getSize();
@@ -207,6 +220,12 @@ class EventManagerController extends \BaseController {
                 $new_ev_attach_record->fk_event = $response_data->data->event_id;
                 $new_ev_attach_record->fk_attachment = $new_attachment_record->id;
                 $new_ev_attach_record->save();
+            }else{
+                //TODO: backtrack the uploaded attachments
+                $this->delete_event($response_data->data->event_id);
+                return Response::json(array(
+                        'response_msg' =>'Error uploading file. Unsupported MIME type.'
+                    ), 400);
             }
         }
 
@@ -261,6 +280,8 @@ class EventManagerController extends \BaseController {
     }
 
     public function get_active_events(){
+
+
 
         //optional parameters
         //since_id
