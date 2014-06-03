@@ -330,7 +330,7 @@ class EventManagerController extends \BaseController {
                 'since_id' => 'integer',
                 'skip' => 'integer|required_with:count',
                 'count' => 'integer|required_with:skip',
-                'order_by' => 'in:created_at,updated_at,rating,distance',
+                'order_by' => 'in:created_at,updated_at,sum_rating,distance',
                 'order_mode' => 'in:ASC,DESC'
             ));
 
@@ -423,16 +423,31 @@ class EventManagerController extends \BaseController {
 
         }else{
         //Get the active events from the database joining user, location, event status
-        //TODO: Get rating later
             if ($_count != null && $_skip!=null){
-                $events_query_array = Watchr_event::where('fk_event_status','=', '1')->orderBy($_order_by,$_order_mode)->skip($_skip)->take($_count)->get();
+                $events_query_array = Watchr_event::select(
+                    array(
+                        '*',
+                        DB::raw('(
+                           SELECT SUM(r.rating_value)
+                            FROM rating r
+                            WHERE r.fk_event_id = watchr_event.event_id
+                            ) AS sum_rating')
+                    )
+                )->where('fk_event_status','=', '1')->orderBy($_order_by,$_order_mode)->skip($_skip)->take($_count)->get();
             }else{
-                $events_query_array = Watchr_event::where('fk_event_status','=', '1')->orderBy($_order_by,$_order_mode)->get();
+                $events_query_array = Watchr_event::select(
+                    array(
+                        '*',
+                        DB::raw('(
+                           SELECT SUM(r.rating_value)
+                            FROM rating r
+                            WHERE r.fk_event_id = watchr_event.event_id
+                            ) AS sum_rating')
+                    )
+                )->where('fk_event_status','=', '1')->orderBy($_order_by,$_order_mode)->get();
             }
             $events_array = $events_query_array->toArray();
         }
-
-
 
         $response_array = array();
         //get the attachments
