@@ -356,14 +356,14 @@ class EventManagerController extends \BaseController {
 //        var_dump($_geocode_data);
         //TODO: Need to redo this query. Not sexy enough
         if($_geocode_data){
-            $query_string =  'SELECT *,latitude, longitude, distance
+            $query_string =  'SELECT *,latitude, longitude, distance_in_km
                           FROM watchr_event E,(
                         SELECT latitude, longitude,position_id,r,
                                111.045* DEGREES(ACOS(COS(RADIANS(latpoint))
                                          * COS(RADIANS(latitude))
                                          * COS(RADIANS(longpoint) - RADIANS(longitude))
                                          + SIN(RADIANS(latpoint))
-                                         * SIN(RADIANS(latitude)))) AS distance
+                                         * SIN(RADIANS(latitude)))) AS distance_in_km
                          FROM position
                          JOIN (
                                 SELECT  '.$_geocode_data[0].'  AS latpoint,  '.$_geocode_data[1].' AS longpoint, '.$_geocode_data[2].' AS r
@@ -375,7 +375,7 @@ class EventManagerController extends \BaseController {
                            BETWEEN longpoint - (r / (111.045 * COS(RADIANS(latpoint))))
                                AND longpoint + (r / (111.045 * COS(RADIANS(latpoint))))
                           ) d
-                         WHERE distance <= r
+                         WHERE distance_in_km <= r
                          AND position_id = E.fk_location
                          ORDER BY '.$_order_by.' '.$_order_mode.'';
 
@@ -386,11 +386,12 @@ class EventManagerController extends \BaseController {
                 $query_results = DB::select(DB::raw($query_string));
             }
 
-
-
-//            var_dump($query_results);
+            var_dump($query_results);
 
             $events_array = array();
+
+
+
 
             foreach($query_results as $event){
                 //iterate the basic query results -> need to turn them in to Watchr_event models
@@ -403,9 +404,9 @@ class EventManagerController extends \BaseController {
         //Get the active events from the database joining user, location, event status
         //TODO: Get rating later
             if ($_count != null && $_skip!=null){
-                $events_query_array = Watchr_event::where('fk_event_status','=', '1')->orderBy('created_at','desc')->skip($_skip)->take($_count)->get();
+                $events_query_array = Watchr_event::where('fk_event_status','=', '1')->orderBy($_order_by,$_order_mode)->skip($_skip)->take($_count)->get();
             }else{
-                $events_query_array = Watchr_event::where('fk_event_status','=', '1')->orderBy('created_at','desc')->get();
+                $events_query_array = Watchr_event::where('fk_event_status','=', '1')->orderBy($_order_by,$_order_mode)->get();
             }
             $events_array = $events_query_array->toArray();
         }
@@ -430,6 +431,13 @@ class EventManagerController extends \BaseController {
             $event['position'] = $location->toArray();
 
             $response_array[] =$event->toArray();
+        }
+
+        //add the distance as well to the event
+        if($_geocode_data){
+            for($i =0 ; $i<count($events_array); $i++){
+                $response_array[$i]['distance'] = $query_results[$i]->distance_in_km;
+            }
         }
 
         return Response::json(array(

@@ -27,7 +27,6 @@
  */
 class Watchr_event extends \Eloquent {
     protected $fillable = [
-
     ];
 
     protected $table = "watchr_event";
