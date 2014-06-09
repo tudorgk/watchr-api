@@ -401,6 +401,7 @@ class EventManagerController extends \BaseController {
                           ) d
                          WHERE distance <= r
                          AND position_id = E.fk_location
+                         AND E.fk_event_status=1
                          ORDER BY '.$_order_by.' '.$_order_mode.'';
 
             if ($_count != null && $_skip!=null){
