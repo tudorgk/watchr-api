@@ -69,9 +69,9 @@ class EventManagerController extends \BaseController {
         $_event_name= Input::get("event_name");
         $_event_description = Input::get("event_description");
 
-        //setting the default category value to 5 = Not Known
+        //setting the default category value to 0 = Not Known
         $_event_category_array = array();
-        $_event_category_array[] = 5;
+        $_event_category_array[] = 1;
 
         if (Input::get("categories")){
             $_event_category_array = json_decode(Input::get("categories"));
@@ -137,7 +137,7 @@ class EventManagerController extends \BaseController {
                 ));
 
             if($category_validator->fails()){
-                $category = 5;
+                $category = 1;
             }
 
             $new_event_category = new Watchr_event_category ();
@@ -469,8 +469,18 @@ class EventManagerController extends \BaseController {
             $event['position'] = $location->toArray();
 
             $event_to_add = $event->toArray();
+
+            //get the rating
             $event_to_add['rating'] = $event->getRating();
+
+            //get the categories
+            $event_categories = $event->categories()->get();
+
+            $event_to_add['categories'] = $event_categories->toArray();
+
+            //add it to the response array
             $response_array[] =$event_to_add;
+
         }
 
         //add the distance as well to the event

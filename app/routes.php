@@ -330,8 +330,19 @@ Route::group(array('before' => 'oauth'), function()
                 "uses" => "EventManagerController@get_event_details"
             ]);
 
-    });
+//Categories
 
+        Route::get("category/all", [
+                "as"   => "category/all",
+                "uses" => "CategoryController@get_all_categories"
+            ]);
+
+        Route::get("category/{category_id}", [
+                "as"   => "category/{category_id}",
+                "uses" => "CategoryController@get_category_info"
+            ]);
+
+    });
 
 
 Route::model("user", "User_profile");

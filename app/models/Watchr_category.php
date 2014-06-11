@@ -20,4 +20,6 @@ class Watchr_category extends \Eloquent {
     protected $primaryKey = "category_id";
 
     public $timestamps = false;
+
+
 }

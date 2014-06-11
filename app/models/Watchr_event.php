@@ -52,4 +52,9 @@ class Watchr_event extends \Eloquent {
         return $this->hasMany('Rating', 'fk_event_id')->sum('rating_value');
     }
 
+    public function categories()
+    {
+        return $this->belongsToMany('Watchr_category','watchr_event_category' , 'fk_event', 'fk_category');
+    }
+
 }
