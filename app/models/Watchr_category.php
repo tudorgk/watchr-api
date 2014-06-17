@@ -11,6 +11,8 @@
  * @method static \Illuminate\Database\Query\Builder|\Watchr_category whereCategoryName($value)
  * @method static \Illuminate\Database\Query\Builder|\Watchr_category whereCategoryDescription($value)
  * @method static \Illuminate\Database\Query\Builder|\Watchr_category whereFkSubcategory($value)
+ * @property string $category_icon
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Watchr_category[] $subcategories
  */
 class Watchr_category extends \Eloquent {
 	protected $fillable = [];

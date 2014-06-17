@@ -37,7 +37,7 @@ class UserProfileController extends \BaseController {
 	public function store()
 	{
 
-        $profile_photo = Input::get('profile_photo');
+        $profile_photo = Input::file('profile_photo');
 
         //sanity checks
         $validator = Validator::make(

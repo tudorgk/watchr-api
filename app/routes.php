@@ -351,6 +351,7 @@ Route::group(array('before' => 'oauth'), function()
 
 
 Route::model("user", "User_profile");
+Route::model("user_photo", "User_photo");
 
 Route::model("profile_status", "Profile_status");
 
