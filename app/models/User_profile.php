@@ -61,7 +61,7 @@ class User_profile extends \Eloquent implements UserInterface, RemindableInterfa
 
     public function photo()
     {
-        return $this->hasOne('Attachment', 'fk_photo', 'id');
+        return $this->hasOne('User_photo', 'photo_id', 'fk_photo');
     }
 
     public function getAuthIdentifier()

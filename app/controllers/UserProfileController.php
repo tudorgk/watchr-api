@@ -129,20 +129,18 @@ class UserProfileController extends \BaseController {
         //get owner id from OAuth
         $ownerId = ResourceServer::getOwnerId();
 
-        $user = User_profile::where('user_id',$_user_id)->get(array(
-                    'user_id',
-                    'username',
-                    'email',
-                    'first_name',
-                    'last_name',
-                    'created_at'
-                ));
+        $user = User_profile::find($_user_id);
+        $response_array = $user->toArray();
 
+        $user_profile_photo = $user->photo()->get()->first();
+
+        if(!is_null($user_profile_photo))
+            $response_array['profile_photo'] = $user_profile_photo->toArray();
 
         return Response::json(
                 array(
                     "message"=>"Request Ok",
-                    "data" => $user->toArray())
+                    "data" => $response_array)
                 ,200);
 
     }

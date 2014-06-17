@@ -38,9 +38,14 @@ class EventManagerController extends \BaseController {
         $creator_query = User_profile::select('user_id', 'username', 'email', 'first_name','last_name' , 'fk_photo')
             ->where('user_id', '=', $event_query->fk_created_by_user)
             ->where('fk_profile_status' , '=', '1')
-            ->get();
+            ->get()
+            ->first();
 
         $response_array['creator'] = $creator_query->toArray();
+        $creator_photo = $creator_query->photo()->get()->first();
+
+        if(!is_null($creator_photo))
+            $response_array['creator']['profile_photo'] = $creator_photo->toArray();
 
         //check if the event has media
         if($event_query->hasMedia){
@@ -472,6 +477,12 @@ class EventManagerController extends \BaseController {
 
             //get the rating
             $event_to_add['rating'] = $event->getRating();
+
+            $creator_photo = $user_query->photo()->get()->first();
+
+            if(!is_null($creator_photo))
+                $event_to_add['creator']['profile_photo'] = $creator_photo->toArray();
+
 
             //event categories
             $event_categories = $event->categories()->get();
