@@ -37,6 +37,8 @@ class UserProfileController extends \BaseController {
 	public function store()
 	{
 
+        $profile_photo = Input::get('profile_photo');
+
         //sanity checks
         $validator = Validator::make(
             array(
@@ -44,14 +46,16 @@ class UserProfileController extends \BaseController {
                 'email' => Input::get("email"),
                 'password' => Input::get("password"),
                 'country' => Input::get("country"),
-                'gender' => Input::get("gender")
+                'gender' => Input::get("gender"),
+                'profile_photo' => $profile_photo
             ),
             array(
                 'username' => 'required|unique:user_profile,username',
                 'password' => 'required|min:8',
                 'email' => 'required|email|unique:user_profile,email',
                 'country' => 'required|integer|exists:country_t,country_id',
-                'gender' => 'required|integer'
+                'gender' => 'required|integer',
+                'profile_photo' => 'mimes:jpeg,png'
             )
         );
 
@@ -74,6 +78,27 @@ class UserProfileController extends \BaseController {
         $user->password = Hash::make(Input::get("password"));
         $user->save();
 
+        //if the user registered a profile photo
+        if(!is_null($profile_photo)){
+
+            //set up the destination path
+            $destinationPath = public_path(). '/profile_photos/'. $user->user_id . '/';
+
+            $user_profile_photo = new User_photo();
+            $user_profile_photo->location = asset('profile_photos/'. $user->user_id . '/'.$profile_photo->getClientOriginalName());;
+            $user_profile_photo->file_type = $profile_photo->getMimeType();
+            $user_profile_photo->filename= $profile_photo->getClientOriginalName();
+            $user_profile_photo->save();
+
+            //move the file to the specified location
+            $profile_photo->move($destinationPath,$profile_photo->getClientOriginalName());
+
+            //bind the profile photo with the user
+            $user->fk_photo = $user_profile_photo->photo_id;
+            $user->save();
+
+        }
+
         return Response::json(array(
                 "response_msg"=>"User Created",
             )
@@ -88,11 +113,6 @@ class UserProfileController extends \BaseController {
 	 */
 	public function show($_user_id)
     {
-
-
-
-
-
         $validator = Validator::make(array(
                 'userId' => $_user_id
             ),array(

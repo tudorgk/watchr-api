@@ -191,7 +191,7 @@ class EventManagerController extends \BaseController {
             $event->save();
         }
 
-        //set up the destination path
+               //set up the destination path
         $destinationPath = public_path(). '/uploads/'. $response_data->data->event_id . '/';
 
         //TODO: Verify Mime Types
@@ -473,10 +473,14 @@ class EventManagerController extends \BaseController {
             //get the rating
             $event_to_add['rating'] = $event->getRating();
 
-            //get the categories
+            //event categories
             $event_categories = $event->categories()->get();
 
-            $event_to_add['categories'] = $event_categories->toArray();
+            $first_event_category = $event_categories->first();
+
+            if (!is_null($first_event_category)){
+                $event_to_add['category'] =  $first_event_category->toArray();
+            }
 
             //add it to the response array
             $response_array[] =$event_to_add;
