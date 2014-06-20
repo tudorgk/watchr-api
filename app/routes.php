@@ -134,9 +134,9 @@ Route::group(array('before' => 'oauth'), function()
     {
 //User Profile routes
 
-        Route::get("users", array(
-                "as"   => "user/index",
-                "uses" => "UserProfileController@index"
+        Route::get("users/me", array(
+                "as"   => "user/me",
+                "uses" => "UserProfileController@get_logged_in_user"
             ));
         Route::get("users/{user_id}", [
                 "as"   => "user/show",

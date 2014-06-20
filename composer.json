@@ -12,6 +12,7 @@
         "zetacomponents/database": "1.4.6",
         "guzzlehttp/guzzle": "dev-master",
         "phpunit/phpunit": "4.1.*",
+        "imagine/imagine" : "dev-master",
 		"lucadegasperi/oauth2-server-laravel": "dev-master"
 	},
 	"autoload": {

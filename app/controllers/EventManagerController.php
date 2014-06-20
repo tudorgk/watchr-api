@@ -173,7 +173,7 @@ class EventManagerController extends \BaseController {
         $allFiles = Input::file('media');
 
         $validator = Validator::make(array(
-                'media' => $allFiles
+                 'media' => $allFiles
             ),array(
                 'media' => 'array|required'
             ));
@@ -211,7 +211,7 @@ class EventManagerController extends \BaseController {
             if(!$mediavalidator->fails()){
                 //create an attachment record
                 $new_attachment_record = new Attachment();
-                $new_attachment_record->location = asset('uploads/'.$response_data->data->event_id . '/'.$file->getClientOriginalName());;
+                $new_attachment_record->location = '/uploads/'.$response_data->data->event_id . '/'.$file->getClientOriginalName();
                 $new_attachment_record->attachment_type = $file->getMimeType();
                 $new_attachment_record->filename= $file->getClientOriginalName();
                 $new_attachment_record->size = $file->getSize();
