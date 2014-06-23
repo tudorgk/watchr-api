@@ -257,6 +257,11 @@ Route::group(array('before' => 'oauth'), function()
          * Watchr Events routes
          */
 //get Event details
+        //get a specific event
+        Route::get("events/details/{event_id}", [
+                "as"   => "events/show",
+                "uses" => "EventManagerController@get_event_details"
+            ]);
 
 
         Route::get("events/active", [
@@ -324,11 +329,6 @@ Route::group(array('before' => 'oauth'), function()
                 "uses" => "EventRatingController@post_rating"
             ]);
 
-        //get a specific event
-        Route::get("events/details/{event_id}", [
-                "as"   => "events/show",
-                "uses" => "EventManagerController@get_event_details"
-            ]);
 
 //Categories
 

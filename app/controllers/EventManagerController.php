@@ -24,6 +24,9 @@ class EventManagerController extends \BaseController {
                 ,400);
         }
 
+        //getting creator ID using OAuth
+        $requester_id = ResourceServer::getOwnerId();
+
         //retrieve all the data
         $event_query = Watchr_event::leftJoin('watchr_event_status', 'watchr_event.fk_event_status', '=', 'watchr_event_status.status_id')
             ->leftJoin('position', 'watchr_event.fk_location', '=', 'position.position_id')
@@ -52,6 +55,23 @@ class EventManagerController extends \BaseController {
 
             $media = $event_query->attachments()->get()->toArray();
             $response_array['media'] = $media;
+        }
+
+        //get the rating sum for the event
+        $ratingValue = Rating::where('fk_event_id','=',$event_id)->sum('rating_value');
+        $response_array['rating'] = $ratingValue;
+
+        //get user rating
+        $user_rating = Rating::where('fk_user_id','=', $requester_id )
+            ->where('fk_event_id', '=', $event_id)
+            ->first();
+
+        if(is_null($user_rating)){
+            $response_array['user_voted'] = false;
+            $response_array['user_vote_value'] = 0;
+        }else{
+            $response_array['user_voted'] = true;
+            $response_array['user_vote_value'] = $user_rating->rating_value;
         }
 
         return Response::json(array(
@@ -323,7 +343,8 @@ class EventManagerController extends \BaseController {
             $_order_mode = 'DESC';
         }
 
-
+        //getting requester ID using OAuth
+        $requester = ResourceServer::getOwnerId();
 
         $validator = Validator::make(array(
                 'since_id' => $_since_id,
@@ -491,6 +512,19 @@ class EventManagerController extends \BaseController {
 
             if (!is_null($first_event_category)){
                 $event_to_add['category'] =  $first_event_category->toArray();
+            }
+
+            //get user rating
+            $user_rating = Rating::where('fk_user_id','=', $requester )
+                ->where('fk_event_id', '=', $event->event_id)
+                ->first();
+
+            if(is_null($user_rating)){
+                $event_to_add['user_voted'] = false;
+                $event_to_add['user_vote_value'] = 0;
+            }else{
+                $event_to_add['user_voted'] = true;
+                $event_to_add['user_vote_value'] = $user_rating->rating_value;
             }
 
             //add it to the response array

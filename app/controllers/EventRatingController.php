@@ -15,7 +15,7 @@ class EventRatingController extends \BaseController {
             ),array(
                 'event_id' => 'required|integer|exists:watchr_event,event_id',
                 'creator_id' => 'required|integer|exists:user_profile,user_id',
-                'rating_value' => 'required|integer'
+                'rating_value' => 'required|integer|in:-1,0,1'
             ));
 
         if ($validator->fails()){
@@ -93,10 +93,11 @@ class EventRatingController extends \BaseController {
         $response_array['eventRating'] = $ratingValue;
 
         if($rating_query){
-            $response_array['userVoted'] = 1;
-            $response_array['userVoteValue'] = $rating_query->rating_value;
+            $response_array['user_voted'] = 1;
+            $response_array['user_vote_value'] = $rating_query->rating_value;
         }else{
-            $response_array['userVoted'] = 0;
+            $response_array['user_voted'] = 0;
+            $response_array['user_vote_value'] = 0;
         }
 
         return Response::json(
