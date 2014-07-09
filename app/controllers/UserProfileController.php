@@ -24,6 +24,12 @@ class UserProfileController extends \BaseController {
             $response_array['profile_photo'] = $profile_photo->toArray();
         }
 
+//        //TODO: Testing push notification
+//        PushNotification::app('watchrIOS')
+//            ->to('22056182836e7bb18221d294b3b1cfcffab69453c23b86c59dbe5abba5999d69')
+//            ->send('Hello World, i`m a push message');
+
+
         return Response::json(
             array(
                 "response_msg"=>"Request Ok",

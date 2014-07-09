@@ -119,9 +119,6 @@ Route::get('oauth/authorize', array('before' => 'check-authorization-params|auth
 //        "uses" => "OAuthAuthorizeController@authorize"
 //    ]);
 
-Route::get('secure-route', array('before' => 'oauth', function(){
-        return "oauth secured route";
-    }));
 
 //User Profile routes
 

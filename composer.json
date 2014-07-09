@@ -13,7 +13,8 @@
         "guzzlehttp/guzzle": "dev-master",
         "phpunit/phpunit": "4.1.*",
         "imagine/imagine" : "dev-master",
-		"lucadegasperi/oauth2-server-laravel": "dev-master"
+		"lucadegasperi/oauth2-server-laravel": "dev-master",
+        "davibennun/laravel-push-notification": "dev-master"
 	},
 	"autoload": {
 		"classmap": [
